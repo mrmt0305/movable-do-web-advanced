@@ -1,0 +1,809 @@
+const AudioContextFunc = window.AudioContext || window.webkitAudioContext;
+
+let audioCtx;
+let player;
+let warmedUp = false;
+
+// 画面上にある鍵盤の「C基準」の MIDI
+const NOTE_LIST = [
+  57,
+  58,
+  59, // A3, Bb3, B3
+  60,
+  61,
+  62,
+  63,
+  64,
+  65,
+  66,
+  67,
+  68,
+  69,
+  70,
+  71,
+  72,
+  73,
+  74,
+  75,
+  76,
+  77, // C5〜F5
+];
+
+// キーボード→鍵盤のマッピング
+
+// メジャーモード時：ASDF JKL; → C4〜C5（ドレミファソラシド）
+const KEY_TO_BASEMIDI_MAJOR = {
+  a: 60, // C4 ド
+  s: 62, // D4 レ
+  d: 64, // E4 ミ
+  f: 65, // F4 ﾌｧ
+  j: 67, // G4 ソ
+  k: 69, // A4 ラ
+  l: 71, // B4 シ
+  ";": 72, // C5 ド
+};
+
+// マイナーモード時：ASDF JKL; → A3〜A4（ラシドレミファソラ）
+const KEY_TO_BASEMIDI_MINOR = {
+  a: 57, // A3 ラ
+  s: 59, // B3 シ
+  d: 60, // C4 ド
+  f: 62, // D4 レ
+  j: 64, // E4 ミ
+  k: 65, // F4 ﾌｧ
+  l: 67, // G4 ソ
+  ";": 69, // A4 ラ
+};
+
+// 黒鍵はモードに関係なく固定（クロマチック用）
+const KEY_TO_BASEMIDI_BLACK = {
+  w: 61, // C#4 / D♭4
+  e: 63, // D#4 / E♭4
+  t: 66, // F#4 / G♭4
+  u: 66, // F#4 / G♭4（同じ音を別キーに）
+  i: 68, // G#4 / A♭4
+  o: 70, // A#4 / B♭4
+};
+
+const DEGREE_SEMITONES_MAJOR = [0, 2, 4, 5, 7, 9, 11];
+const DEGREE_SEMITONES_MINOR = [0, 2, 3, 5, 7, 8, 10];
+
+// 表示用（メジャー）
+const DEGREE_TEXT_MAJOR = ["Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ"];
+const DEGREE7_TEXT_MAJOR = [
+  "Ⅰmaj7",
+  "Ⅱm7",
+  "Ⅲm7",
+  "Ⅳmaj7",
+  "Ⅴ7",
+  "Ⅵm7",
+  "Ⅶm7♭5",
+];
+
+// 表示用（マイナー）※ナチュラルマイナー想定
+// i, ii°, III, iv, v, VI, VII
+const DEGREE_TEXT_MINOR = ["i", "ii°", "III", "iv", "v", "VI", "VII"];
+// セブンス側
+// i7, iiø7, IIImaj7, iv7, v7, VImaj7, VII7
+const DEGREE7_TEXT_MINOR = [
+  "i7",
+  "iiø7",
+  "IIImaj7",
+  "iv7",
+  "v7",
+  "VImaj7",
+  "VII7",
+];
+
+const DEGREE_QUALITIES_MAJOR = [
+  "maj",
+  "min",
+  "min",
+  "maj",
+  "maj",
+  "min",
+  "dim",
+];
+const DEGREE_QUALITIES_MINOR = [
+  "min",
+  "dim",
+  "maj",
+  "min",
+  "min",
+  "maj",
+  "maj",
+];
+const DEGREE_7_QUALITIES_MAJOR = [
+  "maj7", // Ⅰ
+  "min7", // Ⅱ
+  "min7", // Ⅲ
+  "maj7", // Ⅳ
+  "dom7", // Ⅴ
+  "min7", // Ⅵ
+  "halfdim7", // Ⅶ
+];
+const DEGREE_7_QUALITIES_MINOR = [
+  "min7", // Ⅰ (i7)
+  "halfdim7", // Ⅱ (iiø7)
+  "maj7", // Ⅲ (IIImaj7)
+  "min7", // Ⅳ (iv7)
+  "min7", // Ⅴ (v7)  ※ハーモニックならここをdom7に変える余地あり
+  "maj7", // Ⅵ (VImaj7)
+  "dom7", // Ⅶ (VII7)
+];
+
+const DEGREE_INDEX_MAP_MINOR = [5, 6, 0, 1, 2, 3, 4];
+
+const QUALITY_INTERVALS = {
+  maj: [0, 4, 7],
+  min: [0, 3, 7],
+  dim: [0, 3, 6],
+};
+
+// セブンスコード用のインターバル
+const QUALITY_7_INTERVALS = {
+  maj7: [0, 4, 7, 11],
+  min7: [0, 3, 7, 10],
+  dom7: [0, 4, 7, 10],
+  halfdim7: [0, 3, 6, 10],
+};
+
+// 12半音ぶんの表記（#系 / ♭系）
+const NOTE_NAMES_SHARP = [
+  "C",
+  "C#",
+  "D",
+  "D#",
+  "E",
+  "F",
+  "F#",
+  "G",
+  "G#",
+  "A",
+  "A#",
+  "B",
+];
+
+const NOTE_NAMES_FLAT = [
+  "C",
+  "D♭",
+  "D",
+  "E♭",
+  "E",
+  "F",
+  "G♭",
+  "G",
+  "A♭",
+  "A",
+  "B♭",
+  "B",
+];
+
+// 現在のKey名から、#系か♭系かをざっくり決める
+function shouldUseFlatNames(keyName) {
+  // Keyボタンが D♭, E♭, G♭, A♭, B♭ のように♭を含むなら♭表記優先
+  if (keyName.includes("♭")) return true;
+  return false;
+}
+
+// MIDI番号 + transposeSemis から表示用の音名を取得
+function getNoteNameFromMidi(baseMidi, transposeSemi, keyName) {
+  let pitchClass = (baseMidi + transposeSemi) % 12;
+  if (pitchClass < 0) pitchClass += 12;
+
+  const useFlat = shouldUseFlatNames(keyName);
+  const table = useFlat ? NOTE_NAMES_FLAT : NOTE_NAMES_SHARP;
+
+  return table[pitchClass];
+}
+
+// メジャー / マイナーに応じて、「キーボードで叩ける範囲」を変更してグレー付け
+function updatePlayableRange() {
+  document.querySelectorAll(".key").forEach((keyEl) => {
+    const midi = Number(keyEl.dataset.midi);
+
+    let inside = false;
+    if (scaleMode === "major") {
+      // メジャー：C4〜B4 を「内側」にする
+      inside = midi >= 60 && midi <= 71;
+    } else {
+      // マイナー：A3〜A4 を「内側」にする（ラシドレミファソラ）
+      // A3=57, B3=59, C4=60, D4=62, E4=64, F4=65, G4=67, A4=69
+      inside = midi >= 57 && midi <= 69;
+    }
+
+    // inside じゃないところは outside-range でグレーアウト
+    keyEl.classList.toggle("outside-range", !inside);
+  });
+}
+
+// メジャー / マイナー切り替えボタンのセットアップ
+function setupScaleModeButtons() {
+  const majorBtn = document.getElementById("modeMajorBtn");
+  const minorBtn = document.getElementById("modeMinorBtn");
+
+  function setMode(mode) {
+    scaleMode = mode;
+
+    majorBtn.classList.toggle("active", mode === "major");
+    minorBtn.classList.toggle("active", mode === "minor");
+
+    // モードが変わったら transpose / ラベル / グレー範囲を全部更新
+    applyKeyAndMode();
+  }
+
+  if (majorBtn) {
+    majorBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      setMode("major");
+    });
+  }
+
+  if (minorBtn) {
+    minorBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      setMode("minor");
+    });
+  }
+
+  // 初期状態はメジャー
+  setMode("major");
+}
+
+// 鍵盤ボタンの「C」「D」などの表記を、現在のKeyと移調量に合わせて更新
+function updateKeyLabelsForTranspose() {
+  // currentKeyName（例: "C", "D♭"）と transposeSemis を使う
+  document.querySelectorAll(".key").forEach((keyEl) => {
+    const baseMidi = Number(keyEl.dataset.midi);
+    const labelSpan = keyEl.querySelector(".key-label-note");
+    if (!labelSpan) return;
+
+    const name = getNoteNameFromMidi(baseMidi, transposeSemis, currentKeyName);
+    labelSpan.textContent = name;
+  });
+}
+
+// コードボタン下のコード名ラベルを更新
+function updateChordNamesUnderButtons() {
+  document.querySelectorAll(".chord-name").forEach((el) => {
+    const degree = Number(el.dataset.degree);
+
+    let rootOffset;
+    let quality;
+
+    if (scaleMode === "minor") {
+      const majorIndex = DEGREE_INDEX_MAP_MINOR[degree];
+      rootOffset = DEGREE_SEMITONES_MAJOR[majorIndex];
+      quality = DEGREE_QUALITIES_MINOR[degree];
+    } else {
+      rootOffset = DEGREE_SEMITONES_MAJOR[degree];
+      quality = DEGREE_QUALITIES_MAJOR[degree];
+    }
+
+    const rootBaseMidi = BASE_C4 + rootOffset;
+    const rootName = getNoteNameFromMidi(
+      rootBaseMidi,
+      transposeSemis,
+      currentKeyName
+    );
+
+    let suffix = "";
+    if (quality === "min") suffix = "m";
+    else if (quality === "dim") suffix = "dim";
+
+    el.textContent = rootName + suffix;
+  });
+}
+
+const BASE_C4 = 60; // C4
+let octaveShift = 0; // Ctrl / : で変えるオクターブシフト
+let transposeSemis = 0; // Keyボタンで変える移調量（半音）
+let currentKeyName = "C"; // 今選択中のKey（ラベル表示用）
+
+let scaleMode = "major"; // "major" / "minor"
+let currentKeySemi = 0; // Keyボタンの半音値（0=C, 1=D♭,...）
+
+// コードボタンのテキストをモードに応じて更新
+function updateDegreeButtonTexts() {
+  const triTexts =
+    scaleMode === "minor" ? DEGREE_TEXT_MINOR : DEGREE_TEXT_MAJOR;
+  const sevTexts =
+    scaleMode === "minor" ? DEGREE7_TEXT_MINOR : DEGREE7_TEXT_MAJOR;
+
+  document.querySelectorAll(".chord-btn").forEach((btn) => {
+    const d = Number(btn.dataset.degree);
+    if (!Number.isNaN(d) && triTexts[d]) btn.textContent = triTexts[d];
+  });
+
+  document.querySelectorAll(".chord7-btn").forEach((btn) => {
+    const d = Number(btn.dataset.degree);
+    if (!Number.isNaN(d) && sevTexts[d]) btn.textContent = sevTexts[d];
+  });
+}
+
+// モードに応じて、実際に使う transposeSemis を決める
+function computeTransposeSemis(keySemi) {
+  if (scaleMode === "minor") {
+    // マイナーのときは「相対調のメジャー」にする → +3半音
+    // 例: Aマイナー(9) → Cメジャー(0)
+    return (keySemi + 3) % 12;
+  } else {
+    // メジャーのときはそのまま
+    return keySemi;
+  }
+}
+
+// Keyとモードが変わったときにまとめて反映する
+function applyKeyAndMode() {
+  transposeSemis = computeTransposeSemis(currentKeySemi);
+  updateTriadChordNamesUnderButtons();
+  updateChordNamesUnderButtons();
+  updateSeventhChordNamesUnderButtons();
+  updateDegreeButtonTexts();
+  updateKeyLabelsForTranspose();
+  updatePlayableRange();
+  clearReferenceHold();
+  console.log(
+    "Transpose semis:",
+    transposeSemis,
+    "Key:",
+    currentKeyName,
+    "Mode:",
+    scaleMode
+  );
+}
+
+// セブンスコードのサフィックス取得
+function suffixFor7(quality7) {
+  switch (quality7) {
+    case "maj7":
+      return "maj7";
+    case "min7":
+      return "m7";
+    case "dom7":
+      return "7";
+    case "halfdim7":
+      return "m7♭5";
+    default:
+      return "";
+  }
+}
+
+// セブンスコードボタン下のコード名ラベルを更新
+function updateSeventhChordNamesUnderButtons() {
+  document.querySelectorAll(".chord-name-7").forEach((el) => {
+    const degree = Number(el.dataset.degree);
+
+    let rootOffset;
+    let quality7;
+
+    if (scaleMode === "minor") {
+      const majorIndex = DEGREE_INDEX_MAP_MINOR[degree];
+      rootOffset = DEGREE_SEMITONES_MAJOR[majorIndex];
+      quality7 = DEGREE_7_QUALITIES_MINOR[degree];
+    } else {
+      rootOffset = DEGREE_SEMITONES_MAJOR[degree];
+      quality7 = DEGREE_7_QUALITIES_MAJOR[degree];
+    }
+
+    const rootBaseMidi = BASE_C4 + rootOffset;
+    const rootName = getNoteNameFromMidi(
+      rootBaseMidi,
+      transposeSemis,
+      currentKeyName
+    );
+
+    el.textContent = rootName + suffixFor7(quality7);
+  });
+}
+
+function updateTriadChordNamesUnderButtons() {
+  document.querySelectorAll(".chord-name-triad").forEach((el) => {
+    const degree = Number(el.dataset.degree);
+
+    let rootOffset;
+    let quality;
+
+    if (scaleMode === "minor") {
+      const majorIndex = DEGREE_INDEX_MAP_MINOR[degree];
+      rootOffset = DEGREE_SEMITONES_MAJOR[majorIndex];
+      quality = DEGREE_QUALITIES_MINOR[degree];
+    } else {
+      rootOffset = DEGREE_SEMITONES_MAJOR[degree];
+      quality = DEGREE_QUALITIES_MAJOR[degree];
+    }
+
+    const rootBaseMidi = BASE_C4 + rootOffset;
+    const rootName = getNoteNameFromMidi(
+      rootBaseMidi,
+      transposeSemis,
+      currentKeyName
+    );
+
+    let suffix = "";
+    if (quality === "min") suffix = "m";
+    else if (quality === "dim") suffix = "dim";
+
+    el.textContent = rootName + suffix;
+  });
+}
+
+// すでに押しているキー（押しっぱなしで連打しないように）
+const pressedKeySet = new Set();
+
+// オクターブ変更共通処理
+function changeOctave(delta) {
+  const newVal = Math.max(-2, Math.min(2, octaveShift + delta)); // -2〜+2 に制限
+  if (newVal === octaveShift) return;
+  octaveShift = newVal;
+  console.log("Octave:", octaveShift);
+  updateOctaveLabel();
+}
+
+// オクターブ表示ラベル更新
+function updateOctaveLabel() {
+  const el = document.getElementById("octaveStatus");
+  if (el) {
+    let text = "オクターブシフト：";
+    if (octaveShift === 0) {
+      text += "0（基準）";
+    } else if (octaveShift > 0) {
+      text += `+${octaveShift}`;
+    } else {
+      text += `${octaveShift}`;
+    }
+    el.textContent = text;
+  }
+}
+
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new AudioContextFunc();
+    player = new WebAudioFontPlayer();
+    console.log("AudioContext & WebAudioFontPlayer 初期化");
+  }
+}
+
+// すべての音を「ほぼ聞こえない音量」で一瞬鳴らしてウォームアップ
+function warmupNotes() {
+  if (!audioCtx || !player || warmedUp) return;
+
+  const now = audioCtx.currentTime;
+  const duration = 0.01;
+  const volume = 0.0001;
+
+  NOTE_LIST.forEach((baseMidi) => {
+    player.queueWaveTable(
+      audioCtx,
+      audioCtx.destination,
+      _tone_0000_Aspirin_sf2_file,
+      now,
+      baseMidi,
+      duration,
+      volume
+    );
+  });
+
+  warmedUp = true;
+  console.log("ウォームアップ完了");
+}
+
+// baseMidi: C基準のMIDI（例: C4=60, C#4=61,...）
+function playNote(baseMidi) {
+  initAudio();
+
+  if (audioCtx.state === "suspended") {
+    audioCtx.resume();
+  }
+
+  const now = audioCtx.currentTime;
+  const duration = 1.5;
+  const volume = 0.5;
+
+  // 実際に鳴らすピッチ = base + 移調 + オクターブシフト
+  const actualMidi = baseMidi + transposeSemis + octaveShift * 12;
+  flashReferenceKey(actualMidi);
+
+  player.queueWaveTable(
+    audioCtx,
+    audioCtx.destination,
+    _tone_0000_Aspirin_sf2_file,
+    now,
+    actualMidi,
+    duration,
+    volume
+  );
+
+  // 画面上に対応する鍵盤を「baseMidi」で光らせる（見た目はC鍵盤のまま）
+  const keyEl = document.querySelector(`.key[data-midi="${baseMidi}"]`);
+  if (keyEl) {
+    keyEl.classList.add("active");
+    setTimeout(() => keyEl.classList.remove("active"), 150);
+  }
+}
+
+// baseMidi に対して、transposeSemis と octaveShift を加えた実際のMIDIを返す
+function toActualMidi(baseMidi) {
+  return baseMidi + transposeSemis + octaveShift * 12;
+}
+
+// 度数（0〜6）からコード（三和音）を鳴らす
+function playChordByDegree(degreeIndex) {
+  let rootOffset;
+  let quality;
+
+  if (scaleMode === "minor") {
+    const majorIndex = DEGREE_INDEX_MAP_MINOR[degreeIndex];
+    rootOffset = DEGREE_SEMITONES_MAJOR[majorIndex];
+    quality = DEGREE_QUALITIES_MINOR[degreeIndex];
+  } else {
+    rootOffset = DEGREE_SEMITONES_MAJOR[degreeIndex];
+    quality = DEGREE_QUALITIES_MAJOR[degreeIndex];
+  }
+
+  const intervals = QUALITY_INTERVALS[quality] || QUALITY_INTERVALS.maj;
+  const rootBaseMidi = BASE_C4 + rootOffset;
+
+  // ① 構成音（base）を作る
+  const baseMidis = intervals.map((iv) => rootBaseMidi + iv);
+
+  // ② 実際の音程（actual）に変換して “保持点灯”
+  const actualMidis = baseMidis.map(toActualMidi);
+  setReferenceHold(actualMidis);
+
+  // ③ 音を鳴らす（既存の playNote を利用）
+  baseMidis.forEach((m) => playNote(m));
+}
+
+// 度数（0〜6）からセブンスコードを鳴らす
+function playSeventhChordByDegree(degreeIndex) {
+  let rootOffset;
+  let quality7;
+
+  if (scaleMode === "minor") {
+    const majorIndex = DEGREE_INDEX_MAP_MINOR[degreeIndex];
+    rootOffset = DEGREE_SEMITONES_MAJOR[majorIndex];
+    quality7 = DEGREE_7_QUALITIES_MINOR[degreeIndex];
+  } else {
+    rootOffset = DEGREE_SEMITONES_MAJOR[degreeIndex];
+    quality7 = DEGREE_7_QUALITIES_MAJOR[degreeIndex];
+  }
+
+  const intervals = QUALITY_7_INTERVALS[quality7] || QUALITY_7_INTERVALS.maj7;
+  const rootBaseMidi = BASE_C4 + rootOffset;
+
+  const baseMidis = intervals.map((iv) => rootBaseMidi + iv);
+
+  const actualMidis = baseMidis.map(toActualMidi);
+  setReferenceHold(actualMidis);
+
+  baseMidis.forEach((m) => playNote(m));
+}
+
+// 白鍵・黒鍵すべてにマウス / タッチイベント設定
+function attachKeyEvents() {
+  document.querySelectorAll(".key").forEach((keyEl) => {
+    const baseMidi = Number(keyEl.dataset.midi);
+
+    const startPlay = (e) => {
+      e.preventDefault();
+      keyEl.classList.add("active");
+      playNote(baseMidi);
+    };
+
+    const stopPlay = () => {
+      keyEl.classList.remove("active");
+    };
+
+    keyEl.addEventListener("mousedown", startPlay);
+    keyEl.addEventListener("mouseup", stopPlay);
+    keyEl.addEventListener("mouseleave", stopPlay);
+
+    keyEl.addEventListener("touchstart", startPlay, { passive: false });
+    keyEl.addEventListener("touchend", stopPlay);
+    keyEl.addEventListener("touchcancel", stopPlay);
+  });
+}
+
+// 最初のユーザー操作で AudioContext を resume & 全音ウォームアップ
+function setupFirstInteractionWarmup() {
+  const handler = async () => {
+    initAudio();
+    if (audioCtx.state === "suspended") {
+      await audioCtx.resume();
+    }
+    warmupNotes();
+
+    window.removeEventListener("pointerdown", handler);
+  };
+
+  window.addEventListener("pointerdown", handler);
+}
+
+// キーボード操作の設定
+function setupKeyboardControl() {
+  window.addEventListener("keydown", (e) => {
+    const key = e.key;
+
+    // Ctrl でオクターブ下げ
+    if (key === "Control") {
+      if (!pressedKeySet.has("Control")) {
+        changeOctave(-1);
+        console.log("Octave:", octaveShift);
+        pressedKeySet.add("Control");
+      }
+      return;
+    }
+
+    // : でオクターブ上げ（Shift + ;）
+    if (key === ":") {
+      e.preventDefault();
+      if (!pressedKeySet.has(":")) {
+        changeOctave(1);
+        console.log("Octave:", octaveShift);
+        pressedKeySet.add(":");
+      }
+      return;
+    }
+
+    const lower = key.toLowerCase();
+    const lookupKey = key === ";" ? ";" : lower;
+
+    // すでに押しているキーならスキップ（連打防止）
+    if (pressedKeySet.has(lookupKey)) {
+      return;
+    }
+
+    let baseMidi = null;
+
+    // 黒鍵はモード共通
+    if (lookupKey in KEY_TO_BASEMIDI_BLACK) {
+      baseMidi = KEY_TO_BASEMIDI_BLACK[lookupKey];
+    } else {
+      // 白鍵はモードでマッピングを変える
+      if (scaleMode === "minor") {
+        if (lookupKey in KEY_TO_BASEMIDI_MINOR) {
+          baseMidi = KEY_TO_BASEMIDI_MINOR[lookupKey];
+        }
+      } else {
+        if (lookupKey in KEY_TO_BASEMIDI_MAJOR) {
+          baseMidi = KEY_TO_BASEMIDI_MAJOR[lookupKey];
+        }
+      }
+    }
+
+    if (baseMidi == null) {
+      // 対象外のキー（g,h 等）は何もしない
+      return;
+    }
+
+    pressedKeySet.add(lookupKey);
+    e.preventDefault();
+
+    playNote(baseMidi);
+  });
+
+  window.addEventListener("keyup", (e) => {
+    const key = e.key;
+    const lower = key.toLowerCase();
+
+    pressedKeySet.delete(lower);
+    pressedKeySet.delete(key);
+    pressedKeySet.delete(";");
+  });
+}
+
+// オクターブボタンのセットアップ
+function setupOctaveButtons() {
+  const downBtn = document.getElementById("octDownBtn");
+  const upBtn = document.getElementById("octUpBtn");
+
+  if (downBtn) {
+    downBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      changeOctave(-1);
+    });
+  }
+
+  if (upBtn) {
+    upBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      changeOctave(+1);
+    });
+  }
+}
+
+// 移調ボタンのセットアップ
+function setupTransposeButtons() {
+  const buttons = document.querySelectorAll(".tbtn");
+
+  function updateActiveButton(semi) {
+    buttons.forEach((btn) => {
+      const v = Number(btn.dataset.trans);
+      const isActive = v === semi;
+      btn.classList.toggle("active", isActive);
+      if (isActive) {
+        currentKeyName = btn.textContent.trim();
+      }
+    });
+  }
+
+  buttons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const semi = Number(btn.dataset.trans);
+      currentKeySemi = semi;
+      updateActiveButton(semi);
+      applyKeyAndMode();
+    });
+  });
+
+  // 初期値: C (0)
+  currentKeySemi = 0;
+  updateActiveButton(0);
+  applyKeyAndMode();
+}
+
+// コードボタンのセットアップ
+function setupChordButtons() {
+  document.querySelectorAll(".chord-btn").forEach((btn) => {
+    const degree = Number(btn.dataset.degree);
+
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      playChordByDegree(degree);
+    });
+  });
+}
+
+// セブンスコードボタンのセットアップ
+function setupSeventhChordButtons() {
+  document.querySelectorAll(".chord7-btn").forEach((btn) => {
+    const degree = Number(btn.dataset.degree);
+
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      playSeventhChordByDegree(degree);
+    });
+  });
+}
+
+// 参照用ピアノ鍵盤を一瞬光らせる
+function flashReferenceKey(actualMidi) {
+  const el = document.querySelector(`.ref-key[data-midi="${actualMidi}"]`);
+  if (!el) return;
+  el.classList.add("ref-active");
+  setTimeout(() => el.classList.remove("ref-active"), 180);
+}
+
+// 参照用ピアノの保持表示をクリア
+function clearReferenceHold() {
+  document.querySelectorAll(".ref-key.ref-held").forEach((el) => {
+    el.classList.remove("ref-held");
+  });
+}
+
+function setReferenceHold(actualMidis) {
+  // 前回の保持を消す
+  clearReferenceHold();
+
+  // 重複を除外してから保持点灯
+  const unique = Array.from(new Set(actualMidis));
+  unique.forEach((midi) => {
+    const el = document.querySelector(`.ref-key[data-midi="${midi}"]`);
+    if (el) el.classList.add("ref-held");
+  });
+}
+
+// ページ読み込み時にセットアップ
+window.addEventListener("DOMContentLoaded", () => {
+  initAudio();
+  attachKeyEvents();
+  setupFirstInteractionWarmup();
+  setupKeyboardControl();
+  setupTransposeButtons();
+  setupChordButtons();
+  setupSeventhChordButtons();
+  setupOctaveButtons();
+  updateOctaveLabel();
+  setupScaleModeButtons();
+});
