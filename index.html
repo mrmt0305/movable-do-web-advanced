@@ -9,6 +9,16 @@
     <script src="https://cdn.jsdelivr.net/npm/webaudiofont@3.0.4/npm/dist/WebAudioFontPlayer.js"></script>
     <!-- ピアノ音色（Aspirin piano） -->
     <script src="https://surikov.github.io/webaudiofontdata/sound/0000_Aspirin_sf2_file.js"></script>
+    <!-- Guitar -->
+    <script src="https://surikov.github.io/webaudiofontdata/sound/0250_Acoustic_Guitar_sf2_file.js"></script>
+    <!-- Bass -->
+    <script src="https://surikov.github.io/webaudiofontdata/sound/0330_GeneralUserGS_sf2_file.js"></script>
+    <!-- Harp -->
+    <script src="https://surikov.github.io/webaudiofontdata/sound/0460_GeneralUserGS_sf2_file.js"></script>
+    <!-- Violin -->
+    <script src="https://surikov.github.io/webaudiofontdata/sound/0400_GeneralUserGS_sf2_file.js"></script>
+    <!-- Retro (Lead 1 square / SoundBlasterOld) -->
+    <script src="https://surikov.github.io/webaudiofontdata/sound/0800_SoundBlasterOld_sf2.js"></script>
 
     <link rel="stylesheet" href="./style.css">
 </head>
@@ -18,7 +28,27 @@
     <div class="app-shell">
         <!-- サイドパネル（左） -->
         <aside class="side-panel left">
-            <!-- ここに今後機能追加 -->
+            <div class="instrument-panel">
+                <div class="panel-title">楽器</div>
+
+                <div class="instrument-grid">
+                    <button class="inst-btn active" data-inst="piano">ピアノ</button>
+                    <button class="inst-btn" data-inst="guitar">ギター</button>
+                    <button class="inst-btn" data-inst="bass">ベース</button>
+                    <button class="inst-btn" data-inst="harp">ハープ</button>
+                    <button class="inst-btn" data-inst="retro">電子音</button>
+                    <button class="inst-btn" data-inst="violin">バイオリン</button>
+                </div>
+                <div class="duration-panel">
+                    <div class="duration-head">
+                        <span class="duration-title">一音の長さ</span>
+                        <span class="duration-value" id="durationValue">1.50s</span>
+                    </div>
+
+                    <input type="range" id="durationSlider" min="0.10" max="3.00" step="0.05" value="1.50" />
+                </div>
+            </div>
+
         </aside>
 
         <!-- メインコンテンツ -->

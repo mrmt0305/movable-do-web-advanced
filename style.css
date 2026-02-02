@@ -717,3 +717,84 @@ body {
     display: none; /* 狭い時は左右を一旦隠す（必要なら block にして表示） */
   }
 }
+
+.instrument-panel {
+  width: 100%;
+  border-radius: 10px;
+  padding: 12px;
+  box-sizing: border-box;
+  background: rgba(0,0,0,0.12);
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+.instrument-panel .panel-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  opacity: 0.9;
+  margin-bottom: 10px;
+}
+
+.instrument-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.inst-btn {
+  padding: 8px 10px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.18);
+  color: inherit;
+  cursor: pointer;
+  user-select: none;
+}
+
+.inst-btn:hover {
+  filter: brightness(1.06);
+}
+
+.inst-btn.active {
+  border-color: rgba(255,255,255,0.32);
+  background: rgba(255,255,255,0.14);
+}
+
+/* =========================
+   Note Duration Slider (in instrument panel)
+   ========================= */
+
+.duration-panel {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.duration-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.duration-title {
+  font-size: 0.85rem;
+  opacity: 0.9;
+  font-weight: 700;
+}
+
+.duration-value {
+  font-size: 0.85rem;
+  opacity: 0.85;
+  font-variant-numeric: tabular-nums;
+}
+
+#durationSlider {
+  width: 100%;
+  accent-color: rgba(240, 192, 138, 0.9); /* つまみ/バーの色（対応ブラウザ） */
+}
+
+.duration-hint {
+  margin-top: 6px;
+  font-size: 0.75rem;
+  opacity: 0.6;
+}

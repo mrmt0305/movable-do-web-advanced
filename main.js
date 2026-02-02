@@ -3,6 +3,8 @@ const AudioContextFunc = window.AudioContext || window.webkitAudioContext;
 let audioCtx;
 let player;
 let warmedUp = false;
+let currentTone = _tone_0000_Aspirin_sf2_file; // 初期はピアノ
+let noteDuration = 1.5; // 一音の長さ（秒）
 
 // 画面上にある鍵盤の「C基準」の MIDI
 const NOTE_LIST = [
@@ -284,7 +286,7 @@ function updateChordNamesUnderButtons() {
     const rootName = getNoteNameFromMidi(
       rootBaseMidi,
       transposeSemis,
-      currentKeyName
+      currentKeyName,
     );
 
     let suffix = "";
@@ -349,7 +351,7 @@ function applyKeyAndMode() {
     "Key:",
     currentKeyName,
     "Mode:",
-    scaleMode
+    scaleMode,
   );
 }
 
@@ -390,7 +392,7 @@ function updateSeventhChordNamesUnderButtons() {
     const rootName = getNoteNameFromMidi(
       rootBaseMidi,
       transposeSemis,
-      currentKeyName
+      currentKeyName,
     );
 
     el.textContent = rootName + suffixFor7(quality7);
@@ -417,7 +419,7 @@ function updateTriadChordNamesUnderButtons() {
     const rootName = getNoteNameFromMidi(
       rootBaseMidi,
       transposeSemis,
-      currentKeyName
+      currentKeyName,
     );
 
     let suffix = "";
@@ -476,11 +478,11 @@ function warmupNotes() {
     player.queueWaveTable(
       audioCtx,
       audioCtx.destination,
-      _tone_0000_Aspirin_sf2_file,
+      currentTone,
       now,
       baseMidi,
       duration,
-      volume
+      volume,
     );
   });
 
@@ -497,7 +499,7 @@ function playNote(baseMidi) {
   }
 
   const now = audioCtx.currentTime;
-  const duration = 1.5;
+  const duration = noteDuration;
   const volume = 0.5;
 
   // 実際に鳴らすピッチ = base + 移調 + オクターブシフト
@@ -507,11 +509,11 @@ function playNote(baseMidi) {
   player.queueWaveTable(
     audioCtx,
     audioCtx.destination,
-    _tone_0000_Aspirin_sf2_file,
+    currentTone,
     now,
     actualMidi,
     duration,
-    volume
+    volume,
   );
 
   // 画面上に対応する鍵盤を「baseMidi」で光らせる（見た目はC鍵盤のまま）
@@ -794,6 +796,53 @@ function setReferenceHold(actualMidis) {
   });
 }
 
+function setupInstrumentButtons() {
+  const buttons = document.querySelectorAll(".inst-btn");
+  if (!buttons.length) return;
+
+  const toneMap = {
+    piano: _tone_0000_Aspirin_sf2_file,
+    guitar: _tone_0250_Acoustic_Guitar_sf2_file,
+    bass: _tone_0330_GeneralUserGS_sf2_file,
+    harp: _tone_0460_GeneralUserGS_sf2_file,
+    retro: _tone_0800_SoundBlasterOld_sf2,
+    violin: _tone_0400_GeneralUserGS_sf2_file,
+  };
+
+  buttons.forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      const key = btn.dataset.inst;
+      if (!key || !(key in toneMap)) return;
+
+      currentTone = toneMap[key];
+
+      // 見た目：active 切替
+      buttons.forEach((b) => b.classList.toggle("active", b === btn));
+    });
+  });
+}
+
+function setupDurationSlider() {
+  const slider = document.getElementById("durationSlider");
+  const valueEl = document.getElementById("durationValue");
+  if (!slider) return;
+
+  function apply(val) {
+    const num = Number(val);
+    if (!Number.isFinite(num)) return;
+    noteDuration = num;
+    if (valueEl) valueEl.textContent = `${num.toFixed(2)}s`;
+  }
+
+  // 初期反映
+  apply(slider.value);
+
+  // 入力で随時更新
+  slider.addEventListener("input", () => apply(slider.value));
+}
+
 // ページ読み込み時にセットアップ
 window.addEventListener("DOMContentLoaded", () => {
   initAudio();
@@ -806,4 +855,6 @@ window.addEventListener("DOMContentLoaded", () => {
   setupOctaveButtons();
   updateOctaveLabel();
   setupScaleModeButtons();
+  setupInstrumentButtons();
+  setupDurationSlider();
 });
