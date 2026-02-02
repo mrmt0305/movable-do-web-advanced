@@ -14,384 +14,396 @@
 </head>
 
 <body>
-    <h1>移調ピアノ</h1>
-    <p>クリック or キーボード操作で移調できます。<br>※ ブラウザの仕様で、最初のクリック時に音が鳴るまで少しだけタイムラグが出ることがあります。</p>
 
-    <div class="piano">
-        <!-- 鍵盤部分 -->
-        <div class="piano-inner">
-            <!-- A3：B♭3 -->
-            <div class="white-key-wrap">
-                <button class="key white outside-range" data-midi="57">
-                    <span class="key-label">
-                        <span class="key-label-note">A</span>
-                        <span class="key-label-name">ラ</span>
-                    </span>
-                </button>
-                <!-- B♭3 -->
-                <button class="key black outside-range" data-midi="58">
-                    <span class="key-label">
-                        <span class="key-label-note">B♭</span>
-                    </span>
-                </button>
+    <div class="app-shell">
+        <!-- サイドパネル（左） -->
+        <aside class="side-panel left">
+            <!-- ここに今後機能追加 -->
+        </aside>
+
+        <!-- メインコンテンツ -->
+        <main class="center-panel">
+            <h1>移調ピアノ(上級)</h1>
+            <p>クリック or キーボード操作で移調できます。<br>※ ブラウザの仕様で、最初のクリック時に音が鳴るまで少しだけタイムラグが出ることがあります。</p>
+            <div class="piano">
+                <!-- 鍵盤部分 -->
+                <div class="piano-inner">
+                    <!-- A3：B♭3 -->
+                    <div class="white-key-wrap">
+                        <button class="key white outside-range" data-midi="57">
+                            <span class="key-label">
+                                <span class="key-label-note">A</span>
+                                <span class="key-label-name">ラ</span>
+                            </span>
+                        </button>
+                        <!-- B♭3 -->
+                        <button class="key black outside-range" data-midi="58">
+                            <span class="key-label">
+                                <span class="key-label-note">B♭</span>
+                            </span>
+                        </button>
+                    </div>
+
+                    <!-- B3：B-C 間には黒鍵なし -->
+                    <div class="white-key-wrap">
+                        <button class="key white outside-range" data-midi="59">
+                            <span class="key-label">
+                                <span class="key-label-note">B</span>
+                                <span class="key-label-name">シ</span>
+                            </span>
+                        </button>
+                    </div>
+
+                    <!-- C4：C#4 -->
+                    <div class="white-key-wrap">
+                        <button class="key white" data-midi="60">
+                            <span class="key-label">
+                                <span class="key-label-note">C</span>
+                                <span class="key-label-name">ド</span>
+                            </span>
+                        </button>
+                        <!-- C#4 -->
+                        <button class="key black" data-midi="61">
+                            <span class="key-label">
+                                <span class="key-label-note">D♭</span>
+                            </span>
+                        </button>
+                    </div>
+
+                    <!-- D4：D#4 -->
+                    <div class="white-key-wrap">
+                        <button class="key white" data-midi="62">
+                            <span class="key-label">
+                                <span class="key-label-note">D</span>
+                                <span class="key-label-name">レ</span>
+                            </span>
+                        </button>
+                        <!-- D#4 -->
+                        <button class="key black" data-midi="63">
+                            <span class="key-label">
+                                <span class="key-label-note">E♭</span>
+                            </span>
+                        </button>
+                    </div>
+
+                    <!-- E4：E-F 間には黒鍵なし -->
+                    <div class="white-key-wrap">
+                        <button class="key white" data-midi="64">
+                            <span class="key-label">
+                                <span class="key-label-note">E</span>
+                                <span class="key-label-name">ミ</span>
+                            </span>
+                        </button>
+                    </div>
+
+                    <!-- F4：F#4 -->
+                    <div class="white-key-wrap">
+                        <button class="key white" data-midi="65">
+                            <span class="key-label">
+                                <span class="key-label-note">F</span>
+                                <span class="key-label-name">ﾌｧ</span>
+                            </span>
+                        </button>
+                        <!-- F#4 -->
+                        <button class="key black" data-midi="66">
+                            <span class="key-label">
+                                <span class="key-label-note">G♭</span>
+                            </span>
+                        </button>
+                    </div>
+
+                    <!-- G4：G#4 -->
+                    <div class="white-key-wrap">
+                        <button class="key white" data-midi="67">
+                            <span class="key-label">
+                                <span class="key-label-note">G</span>
+                                <span class="key-label-name">ソ</span>
+                            </span>
+                        </button>
+                        <!-- G#4 -->
+                        <button class="key black" data-midi="68">
+                            <span class="key-label">
+                                <span class="key-label-note">A♭</span>
+                            </span>
+                        </button>
+                    </div>
+
+                    <!-- A4：A#4 -->
+                    <div class="white-key-wrap">
+                        <button class="key white" data-midi="69">
+                            <span class="key-label">
+                                <span class="key-label-note">A</span>
+                                <span class="key-label-name">ラ</span>
+                            </span>
+                        </button>
+                        <!-- A#4 -->
+                        <button class="key black" data-midi="70">
+                            <span class="key-label">
+                                <span class="key-label-note">B♭</span>
+                            </span>
+                        </button>
+                    </div>
+
+                    <!-- B4：B-C 間には黒鍵なし -->
+                    <div class="white-key-wrap">
+                        <button class="key white" data-midi="71">
+                            <span class="key-label">
+                                <span class="key-label-note">B</span>
+                                <span class="key-label-name">シ</span>
+                            </span>
+                        </button>
+                    </div>
+
+                    <!-- C5：C#5 -->
+                    <div class="white-key-wrap">
+                        <button class="key white outside-range" data-midi="72">
+                            <span class="key-label">
+                                <span class="key-label-note">C</span>
+                                <span class="key-label-name">ド</span>
+                            </span>
+                        </button>
+                        <!-- C#5 -->
+                        <button class="key black outside-range" data-midi="73">
+                            <span class="key-label">
+                                <span class="key-label-note">D♭</span>
+                            </span>
+                        </button>
+                    </div>
+
+                    <!-- D5：D#5 -->
+                    <div class="white-key-wrap">
+                        <button class="key white outside-range" data-midi="74">
+                            <span class="key-label">
+                                <span class="key-label-note">D</span>
+                                <span class="key-label-name">レ</span>
+                            </span>
+                        </button>
+                        <!-- D#5 -->
+                        <button class="key black outside-range" data-midi="75">
+                            <span class="key-label">
+                                <span class="key-label-note">E♭</span>
+                            </span>
+                        </button>
+                    </div>
+
+                    <!-- E5：E-F 間には黒鍵なし -->
+                    <div class="white-key-wrap">
+                        <button class="key white outside-range" data-midi="76">
+                            <span class="key-label">
+                                <span class="key-label-note">E</span>
+                                <span class="key-label-name">ミ</span>
+                            </span>
+                        </button>
+                    </div>
+
+                    <!-- F5：F-G 間には黒鍵なし（ここで終わり） -->
+                    <div class="white-key-wrap">
+                        <button class="key white outside-range" data-midi="77">
+                            <span class="key-label">
+                                <span class="key-label-note">F</span>
+                                <span class="key-label-name">ﾌｧ</span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+                <!-- オクターブダウンボタン -->
+                <button type="button" class="octave-btn left" id="octDownBtn">◀︎</button>
+                <!-- オクターブアップボタン -->
+                <button type="button" class="octave-btn right" id="octUpBtn">▶︎</button>
             </div>
+            <div class="transpose-controls">
+                <div class="scale-mode-buttons">
+                    <button class="mode-btn active" data-mode="major" id="modeMajorBtn">メジャー</button>
+                    <button class="mode-btn" data-mode="minor" id="modeMinorBtn">マイナー</button>
+                </div>
 
-            <!-- B3：B-C 間には黒鍵なし -->
-            <div class="white-key-wrap">
-                <button class="key white outside-range" data-midi="59">
-                    <span class="key-label">
-                        <span class="key-label-note">B</span>
-                        <span class="key-label-name">シ</span>
-                    </span>
-                </button>
+                <span class="transpose-label">Key:</span>
+                <div class="transpose-buttons">
+                    <button class="tbtn active" data-trans="0">C</button>
+                    <button class="tbtn" data-trans="1">D♭</button>
+                    <button class="tbtn" data-trans="2">D</button>
+                    <button class="tbtn" data-trans="3">E♭</button>
+                    <button class="tbtn" data-trans="4">E</button>
+                    <button class="tbtn" data-trans="5">F</button>
+                    <button class="tbtn" data-trans="6">G♭</button>
+                    <button class="tbtn" data-trans="7">G</button>
+                    <button class="tbtn" data-trans="8">A♭</button>
+                    <button class="tbtn" data-trans="9">A</button>
+                    <button class="tbtn" data-trans="10">B♭</button>
+                    <button class="tbtn" data-trans="11">B</button>
+                </div>
             </div>
+            <div class="chord-section">
+                <div class="section-title">コードを鳴らす</div>
 
-            <!-- C4：C#4 -->
-            <div class="white-key-wrap">
-                <button class="key white" data-midi="60">
-                    <span class="key-label">
-                        <span class="key-label-note">C</span>
-                        <span class="key-label-name">ド</span>
-                    </span>
-                </button>
-                <!-- C#4 -->
-                <button class="key black" data-midi="61">
-                    <span class="key-label">
-                        <span class="key-label-note">D♭</span>
-                    </span>
-                </button>
+                <div class="chord-grid">
+                    <div class="chord-col">
+                        <button class="chord-btn" data-degree="0">Ⅰ</button>
+                        <div class="chord-name-triad" data-degree="0">C</div>
+
+                        <button class="chord7-btn" data-degree="0">Ⅰmaj7</button>
+                        <div class="chord-name-7" data-degree="0">Cmaj7</div>
+                    </div>
+                    <div class="chord-col">
+                        <button class="chord-btn" data-degree="1">Ⅱ</button>
+                        <div class="chord-name-triad" data-degree="1">Dm</div>
+
+                        <button class="chord7-btn" data-degree="1">Ⅱm7</button>
+                        <div class="chord-name-7" data-degree="1">Dm7</div>
+                    </div>
+                    <div class="chord-col">
+                        <button class="chord-btn" data-degree="2">Ⅲ</button>
+                        <div class="chord-name-triad" data-degree="2">Em</div>
+
+                        <button class="chord7-btn" data-degree="2">Ⅲm7</button>
+                        <div class="chord-name-7" data-degree="2">Em7</div>
+                    </div>
+                    <div class="chord-col">
+                        <button class="chord-btn" data-degree="3">Ⅳ</button>
+                        <div class="chord-name-triad" data-degree="3">F</div>
+
+                        <button class="chord7-btn" data-degree="3">Ⅳmaj7</button>
+                        <div class="chord-name-7" data-degree="3">Fmaj7</div>
+                    </div>
+                    <div class="chord-col">
+                        <button class="chord-btn" data-degree="4">Ⅴ</button>
+                        <div class="chord-name-triad" data-degree="4">G</div>
+
+                        <button class="chord7-btn" data-degree="4">Ⅴ7</button>
+                        <div class="chord-name-7" data-degree="4">G7</div>
+                    </div>
+                    <div class="chord-col">
+                        <button class="chord-btn" data-degree="5">Ⅵ</button>
+                        <div class="chord-name-triad" data-degree="5">Am</div>
+
+                        <button class="chord7-btn" data-degree="5">Ⅵm7</button>
+                        <div class="chord-name-7" data-degree="5">Am7</div>
+                    </div>
+                    <div class="chord-col">
+                        <button class="chord-btn" data-degree="6">Ⅶ</button>
+                        <div class="chord-name-triad" data-degree="6">Bdim</div>
+
+                        <button class="chord7-btn" data-degree="6">Ⅶm7♭5</button>
+                        <div class="chord-name-7" data-degree="6">Bm7♭5</div>
+                    </div>
+                </div>
+
             </div>
+            <div class="ref-piano">
+                <div class="ref-piano-title">参照用ピアノ（固定表記）</div>
 
-            <!-- D4：D#4 -->
-            <div class="white-key-wrap">
-                <button class="key white" data-midi="62">
-                    <span class="key-label">
-                        <span class="key-label-note">D</span>
-                        <span class="key-label-name">レ</span>
-                    </span>
-                </button>
-                <!-- D#4 -->
-                <button class="key black" data-midi="63">
-                    <span class="key-label">
-                        <span class="key-label-note">E♭</span>
-                    </span>
-                </button>
+                <div class="ref-piano-inner">
+                    <!-- A3 -->
+                    <div class="ref-white-key-wrap">
+                        <div class="ref-key ref-white" data-midi="57"><span>A3</span></div>
+                        <!-- Bb3 -->
+                        <div class="ref-key ref-black" data-midi="58"><span>A#3<br>B♭3</span></div>
+                    </div>
+
+                    <!-- B3 -->
+                    <div class="ref-white-key-wrap">
+                        <div class="ref-key ref-white" data-midi="59"><span>B3</span></div>
+                    </div>
+
+                    <!-- C4 -->
+                    <div class="ref-white-key-wrap">
+                        <div class="ref-key ref-white" data-midi="60"><span>C4</span></div>
+                        <!-- C#4 -->
+                        <div class="ref-key ref-black" data-midi="61"><span>C#4<br>D♭4</span></div>
+                    </div>
+
+                    <!-- D4 -->
+                    <div class="ref-white-key-wrap">
+                        <div class="ref-key ref-white" data-midi="62"><span>D4</span></div>
+                        <!-- D#4 -->
+                        <div class="ref-key ref-black" data-midi="63"><span>D#4<br>E♭4</span></div>
+                    </div>
+
+                    <!-- E4 -->
+                    <div class="ref-white-key-wrap">
+                        <div class="ref-key ref-white" data-midi="64"><span>E4</span></div>
+                    </div>
+
+                    <!-- F4 -->
+                    <div class="ref-white-key-wrap">
+                        <div class="ref-key ref-white" data-midi="65"><span>F4</span></div>
+                        <!-- F#4 -->
+                        <div class="ref-key ref-black" data-midi="66"><span>F#4<br>G♭4</span></div>
+                    </div>
+
+                    <!-- G4 -->
+                    <div class="ref-white-key-wrap">
+                        <div class="ref-key ref-white" data-midi="67"><span>G4</span></div>
+                        <!-- G#4 -->
+                        <div class="ref-key ref-black" data-midi="68"><span>G#4<br>A♭4</span></div>
+                    </div>
+
+                    <!-- A4 -->
+                    <div class="ref-white-key-wrap">
+                        <div class="ref-key ref-white" data-midi="69"><span>A4</span></div>
+                        <!-- A#4 -->
+                        <div class="ref-key ref-black" data-midi="70"><span>A#4<br>B♭4</span></div>
+                    </div>
+
+                    <!-- B4 -->
+                    <div class="ref-white-key-wrap">
+                        <div class="ref-key ref-white" data-midi="71"><span>B4</span></div>
+                    </div>
+
+                    <!-- C5 -->
+                    <div class="ref-white-key-wrap">
+                        <div class="ref-key ref-white" data-midi="72"><span>C5</span></div>
+                        <!-- C#5 -->
+                        <div class="ref-key ref-black" data-midi="73"><span>C#5<br>D♭5</span></div>
+                    </div>
+
+                    <!-- D5 -->
+                    <div class="ref-white-key-wrap">
+                        <div class="ref-key ref-white" data-midi="74"><span>D5</span></div>
+                        <!-- D#5 -->
+                        <div class="ref-key ref-black" data-midi="75"><span>D#5<br>E♭5</span></div>
+                    </div>
+
+                    <!-- E5 -->
+                    <div class="ref-white-key-wrap">
+                        <div class="ref-key ref-white" data-midi="76"><span>E5</span></div>
+                    </div>
+
+                    <!-- F5 -->
+                    <div class="ref-white-key-wrap">
+                        <div class="ref-key ref-white" data-midi="77"><span>F5</span></div>
+                    </div>
+                </div>
             </div>
+            <footer>
+                <div class="footer" id="octaveStatus">オクターブシフト：0（基準）</div>
+                <div class="footer">
+                    <div>Powered by WebAudioFont</div>
+                    <div>
+                        GitHubリンク：
+                        <a href="https://github.com/mrmt0305/movable-do-web" target="_blank"
+                            style="color: #6b7280; text-decoration: underline;">https://github.com/mrmt0305/movable-do-web</a>
+                    </div>
+                    <div>
+                        WebAudioFont公式サイト：
+                        <a href="https://surikov.github.io/webaudiofont/" target="_blank"
+                            style="color: #6b7280; text-decoration: underline;">https://surikov.github.io/webaudiofont/</a>
+                    </div>
+                    <div>キーボード操作ガイド： A -> ド | S -> レ | D -> ミ | F -> ファ | G -> ソ | H -> ラ | J -> シ | K -> ド | W -> ド# |
+                        E
+                        -> レ# | T,U -> ファ# | I -> ソ# | O -> ラ#</div>
+                    <div class="footer">キーボード操作ガイド： ctrl -> オクターブシフト(-1) | : -> オクターブシフト(+1)</div>
+                </div>
+            </footer>
+        </main>
 
-            <!-- E4：E-F 間には黒鍵なし -->
-            <div class="white-key-wrap">
-                <button class="key white" data-midi="64">
-                    <span class="key-label">
-                        <span class="key-label-note">E</span>
-                        <span class="key-label-name">ミ</span>
-                    </span>
-                </button>
-            </div>
-
-            <!-- F4：F#4 -->
-            <div class="white-key-wrap">
-                <button class="key white" data-midi="65">
-                    <span class="key-label">
-                        <span class="key-label-note">F</span>
-                        <span class="key-label-name">ﾌｧ</span>
-                    </span>
-                </button>
-                <!-- F#4 -->
-                <button class="key black" data-midi="66">
-                    <span class="key-label">
-                        <span class="key-label-note">G♭</span>
-                    </span>
-                </button>
-            </div>
-
-            <!-- G4：G#4 -->
-            <div class="white-key-wrap">
-                <button class="key white" data-midi="67">
-                    <span class="key-label">
-                        <span class="key-label-note">G</span>
-                        <span class="key-label-name">ソ</span>
-                    </span>
-                </button>
-                <!-- G#4 -->
-                <button class="key black" data-midi="68">
-                    <span class="key-label">
-                        <span class="key-label-note">A♭</span>
-                    </span>
-                </button>
-            </div>
-
-            <!-- A4：A#4 -->
-            <div class="white-key-wrap">
-                <button class="key white" data-midi="69">
-                    <span class="key-label">
-                        <span class="key-label-note">A</span>
-                        <span class="key-label-name">ラ</span>
-                    </span>
-                </button>
-                <!-- A#4 -->
-                <button class="key black" data-midi="70">
-                    <span class="key-label">
-                        <span class="key-label-note">B♭</span>
-                    </span>
-                </button>
-            </div>
-
-            <!-- B4：B-C 間には黒鍵なし -->
-            <div class="white-key-wrap">
-                <button class="key white" data-midi="71">
-                    <span class="key-label">
-                        <span class="key-label-note">B</span>
-                        <span class="key-label-name">シ</span>
-                    </span>
-                </button>
-            </div>
-
-            <!-- C5：C#5 -->
-            <div class="white-key-wrap">
-                <button class="key white outside-range" data-midi="72">
-                    <span class="key-label">
-                        <span class="key-label-note">C</span>
-                        <span class="key-label-name">ド</span>
-                    </span>
-                </button>
-                <!-- C#5 -->
-                <button class="key black outside-range" data-midi="73">
-                    <span class="key-label">
-                        <span class="key-label-note">D♭</span>
-                    </span>
-                </button>
-            </div>
-
-            <!-- D5：D#5 -->
-            <div class="white-key-wrap">
-                <button class="key white outside-range" data-midi="74">
-                    <span class="key-label">
-                        <span class="key-label-note">D</span>
-                        <span class="key-label-name">レ</span>
-                    </span>
-                </button>
-                <!-- D#5 -->
-                <button class="key black outside-range" data-midi="75">
-                    <span class="key-label">
-                        <span class="key-label-note">E♭</span>
-                    </span>
-                </button>
-            </div>
-
-            <!-- E5：E-F 間には黒鍵なし -->
-            <div class="white-key-wrap">
-                <button class="key white outside-range" data-midi="76">
-                    <span class="key-label">
-                        <span class="key-label-note">E</span>
-                        <span class="key-label-name">ミ</span>
-                    </span>
-                </button>
-            </div>
-
-            <!-- F5：F-G 間には黒鍵なし（ここで終わり） -->
-            <div class="white-key-wrap">
-                <button class="key white outside-range" data-midi="77">
-                    <span class="key-label">
-                        <span class="key-label-note">F</span>
-                        <span class="key-label-name">ﾌｧ</span>
-                    </span>
-                </button>
-            </div>
-        </div>
-        <!-- オクターブダウンボタン -->
-        <button type="button" class="octave-btn left" id="octDownBtn">◀︎</button>
-        <!-- オクターブアップボタン -->
-        <button type="button" class="octave-btn right" id="octUpBtn">▶︎</button>
-    </div>
-
-    <div class="transpose-controls">
-        <div class="scale-mode-buttons">
-            <button class="mode-btn active" data-mode="major" id="modeMajorBtn">メジャー</button>
-            <button class="mode-btn" data-mode="minor" id="modeMinorBtn">マイナー</button>
-        </div>
-
-        <span class="transpose-label">Key:</span>
-        <div class="transpose-buttons">
-            <button class="tbtn active" data-trans="0">C</button>
-            <button class="tbtn" data-trans="1">D♭</button>
-            <button class="tbtn" data-trans="2">D</button>
-            <button class="tbtn" data-trans="3">E♭</button>
-            <button class="tbtn" data-trans="4">E</button>
-            <button class="tbtn" data-trans="5">F</button>
-            <button class="tbtn" data-trans="6">G♭</button>
-            <button class="tbtn" data-trans="7">G</button>
-            <button class="tbtn" data-trans="8">A♭</button>
-            <button class="tbtn" data-trans="9">A</button>
-            <button class="tbtn" data-trans="10">B♭</button>
-            <button class="tbtn" data-trans="11">B</button>
-        </div>
-    </div>
-
-    <div class="chord-section">
-        <div class="section-title">コードを鳴らす</div>
-
-        <div class="chord-grid">
-            <div class="chord-col">
-                <button class="chord-btn" data-degree="0">Ⅰ</button>
-                <div class="chord-name-triad" data-degree="0">C</div>
-
-                <button class="chord7-btn" data-degree="0">Ⅰmaj7</button>
-                <div class="chord-name-7" data-degree="0">Cmaj7</div>
-            </div>
-            <div class="chord-col">
-                <button class="chord-btn" data-degree="1">Ⅱ</button>
-                <div class="chord-name-triad" data-degree="1">Dm</div>
-
-                <button class="chord7-btn" data-degree="1">Ⅱm7</button>
-                <div class="chord-name-7" data-degree="1">Dm7</div>
-            </div>
-            <div class="chord-col">
-                <button class="chord-btn" data-degree="2">Ⅲ</button>
-                <div class="chord-name-triad" data-degree="2">Em</div>
-
-                <button class="chord7-btn" data-degree="2">Ⅲm7</button>
-                <div class="chord-name-7" data-degree="2">Em7</div>
-            </div>
-            <div class="chord-col">
-                <button class="chord-btn" data-degree="3">Ⅳ</button>
-                <div class="chord-name-triad" data-degree="3">F</div>
-
-                <button class="chord7-btn" data-degree="3">Ⅳmaj7</button>
-                <div class="chord-name-7" data-degree="3">Fmaj7</div>
-            </div>
-            <div class="chord-col">
-                <button class="chord-btn" data-degree="4">Ⅴ</button>
-                <div class="chord-name-triad" data-degree="4">G</div>
-
-                <button class="chord7-btn" data-degree="4">Ⅴ7</button>
-                <div class="chord-name-7" data-degree="4">G7</div>
-            </div>
-            <div class="chord-col">
-                <button class="chord-btn" data-degree="5">Ⅵ</button>
-                <div class="chord-name-triad" data-degree="5">Am</div>
-
-                <button class="chord7-btn" data-degree="5">Ⅵm7</button>
-                <div class="chord-name-7" data-degree="5">Am7</div>
-            </div>
-            <div class="chord-col">
-                <button class="chord-btn" data-degree="6">Ⅶ</button>
-                <div class="chord-name-triad" data-degree="6">Bdim</div>
-
-                <button class="chord7-btn" data-degree="6">Ⅶm7♭5</button>
-                <div class="chord-name-7" data-degree="6">Bm7♭5</div>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="ref-piano">
-        <div class="ref-piano-title">参照用ピアノ（固定表記）</div>
-
-        <div class="ref-piano-inner">
-            <!-- A3 -->
-            <div class="ref-white-key-wrap">
-                <div class="ref-key ref-white" data-midi="57"><span>A3</span></div>
-                <!-- Bb3 -->
-                <div class="ref-key ref-black" data-midi="58"><span>A#3<br>B♭3</span></div>
-            </div>
-
-            <!-- B3 -->
-            <div class="ref-white-key-wrap">
-                <div class="ref-key ref-white" data-midi="59"><span>B3</span></div>
-            </div>
-
-            <!-- C4 -->
-            <div class="ref-white-key-wrap">
-                <div class="ref-key ref-white" data-midi="60"><span>C4</span></div>
-                <!-- C#4 -->
-                <div class="ref-key ref-black" data-midi="61"><span>C#4<br>D♭4</span></div>
-            </div>
-
-            <!-- D4 -->
-            <div class="ref-white-key-wrap">
-                <div class="ref-key ref-white" data-midi="62"><span>D4</span></div>
-                <!-- D#4 -->
-                <div class="ref-key ref-black" data-midi="63"><span>D#4<br>E♭4</span></div>
-            </div>
-
-            <!-- E4 -->
-            <div class="ref-white-key-wrap">
-                <div class="ref-key ref-white" data-midi="64"><span>E4</span></div>
-            </div>
-
-            <!-- F4 -->
-            <div class="ref-white-key-wrap">
-                <div class="ref-key ref-white" data-midi="65"><span>F4</span></div>
-                <!-- F#4 -->
-                <div class="ref-key ref-black" data-midi="66"><span>F#4<br>G♭4</span></div>
-            </div>
-
-            <!-- G4 -->
-            <div class="ref-white-key-wrap">
-                <div class="ref-key ref-white" data-midi="67"><span>G4</span></div>
-                <!-- G#4 -->
-                <div class="ref-key ref-black" data-midi="68"><span>G#4<br>A♭4</span></div>
-            </div>
-
-            <!-- A4 -->
-            <div class="ref-white-key-wrap">
-                <div class="ref-key ref-white" data-midi="69"><span>A4</span></div>
-                <!-- A#4 -->
-                <div class="ref-key ref-black" data-midi="70"><span>A#4<br>B♭4</span></div>
-            </div>
-
-            <!-- B4 -->
-            <div class="ref-white-key-wrap">
-                <div class="ref-key ref-white" data-midi="71"><span>B4</span></div>
-            </div>
-
-            <!-- C5 -->
-            <div class="ref-white-key-wrap">
-                <div class="ref-key ref-white" data-midi="72"><span>C5</span></div>
-                <!-- C#5 -->
-                <div class="ref-key ref-black" data-midi="73"><span>C#5<br>D♭5</span></div>
-            </div>
-
-            <!-- D5 -->
-            <div class="ref-white-key-wrap">
-                <div class="ref-key ref-white" data-midi="74"><span>D5</span></div>
-                <!-- D#5 -->
-                <div class="ref-key ref-black" data-midi="75"><span>D#5<br>E♭5</span></div>
-            </div>
-
-            <!-- E5 -->
-            <div class="ref-white-key-wrap">
-                <div class="ref-key ref-white" data-midi="76"><span>E5</span></div>
-            </div>
-
-            <!-- F5 -->
-            <div class="ref-white-key-wrap">
-                <div class="ref-key ref-white" data-midi="77"><span>F5</span></div>
-            </div>
-        </div>
+        <!-- サイドパネル（右） -->
+        <aside class="side-panel right">
+            <!-- ここに今後機能追加 -->
+        </aside>
     </div>
 
     <script src="main.js"> </script>
-
-    <footer>
-        <div class="footer" id="octaveStatus">オクターブシフト：0（基準）</div>
-        <div class="footer">
-            <div>Powered by WebAudioFont</div>
-            <div>
-                GitHubリンク：
-                <a href="https://github.com/mrmt0305/movable-do-web" target="_blank"
-                    style="color: #6b7280; text-decoration: underline;">https://github.com/mrmt0305/movable-do-web</a>
-            </div>
-            <div>
-                WebAudioFont公式サイト：
-                <a href="https://surikov.github.io/webaudiofont/" target="_blank"
-                    style="color: #6b7280; text-decoration: underline;">https://surikov.github.io/webaudiofont/</a>
-            </div>
-            <div>キーボード操作ガイド： A -> ド | S -> レ | D -> ミ | F -> ファ | G -> ソ | H -> ラ | J -> シ | K -> ド | W -> ド# | E
-                -> レ# | T,U -> ファ# | I -> ソ# | O -> ラ#</div>
-            <div class="footer">キーボード操作ガイド： ctrl -> オクターブシフト(-1) | : -> オクターブシフト(+1)</div>
-        </div>
-    </footer>
 </body>
 
 </html>
