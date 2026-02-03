@@ -30,7 +30,6 @@
         <aside class="side-panel left">
             <div class="instrument-panel">
                 <div class="panel-title">楽器</div>
-
                 <div class="instrument-grid">
                     <button class="inst-btn active" data-inst="piano">ピアノ</button>
                     <button class="inst-btn" data-inst="guitar">ギター</button>
@@ -41,14 +40,25 @@
                 </div>
                 <div class="duration-panel">
                     <div class="duration-head">
-                        <span class="duration-title">一音の長さ</span>
                         <span class="duration-value" id="durationValue">1.50s</span>
                     </div>
 
                     <input type="range" id="durationSlider" min="0.10" max="3.00" step="0.05" value="1.50" />
                 </div>
             </div>
-
+            <div class="chord-notes-panel">
+                <div class="panel-title">構成音</div>
+                <div class="chord-notes-hint">※中央の「コードを鳴らす」ボタンを押すと更新</div>
+                <div class="last-chord-row">
+                    <span class="last-chord-label" id="lastChordLabel">（未選択）</span>
+                </div>
+                <div class="note-chip-row" id="lastChordNotes">
+                    <!-- JSで C / E / G みたいに1つずつ追加 -->
+                </div>
+            </div>
+            <button type="button" class="arp-btn" id="arpPlayBtn" disabled>
+                音を順番に鳴らす
+            </button>
         </aside>
 
         <!-- メインコンテンツ -->

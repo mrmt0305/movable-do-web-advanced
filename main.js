@@ -5,6 +5,8 @@ let player;
 let warmedUp = false;
 let currentTone = _tone_0000_Aspirin_sf2_file; // 初期はピアノ
 let noteDuration = 1.5; // 一音の長さ（秒）
+let lastChordActualMidis = []; // 最後に選んだコードの構成音（実MIDI）
+let isArpPlaying = false; // 連打防止
 
 // 画面上にある鍵盤の「C基準」の MIDI
 const NOTE_LIST = [
@@ -430,6 +432,25 @@ function updateTriadChordNamesUnderButtons() {
   });
 }
 
+function updateLastChordPanel(chordLabel, noteNames) {
+  const labelEl = document.getElementById("lastChordLabel");
+  const notesWrap = document.getElementById("lastChordNotes");
+  if (!labelEl || !notesWrap) return;
+
+  labelEl.textContent = chordLabel || "（未選択）";
+
+  // 既存をクリア
+  notesWrap.innerHTML = "";
+
+  // 1音ずつチップ化
+  noteNames.forEach((name) => {
+    const span = document.createElement("span");
+    span.className = "note-chip";
+    span.textContent = name;
+    notesWrap.appendChild(span);
+  });
+}
+
 // すでに押しているキー（押しっぱなしで連打しないように）
 const pressedKeySet = new Set();
 
@@ -524,6 +545,30 @@ function playNote(baseMidi) {
   }
 }
 
+function playActualMidi(actualMidi) {
+  initAudio();
+
+  if (audioCtx.state === "suspended") {
+    audioCtx.resume();
+  }
+
+  const now = audioCtx.currentTime;
+  const duration = noteDuration; // 既存スライダーの値を使う
+  const volume = 0.5;
+
+  flashReferenceKey(actualMidi);
+
+  player.queueWaveTable(
+    audioCtx,
+    audioCtx.destination,
+    currentTone,
+    now,
+    actualMidi,
+    duration,
+    volume,
+  );
+}
+
 // baseMidi に対して、transposeSemis と octaveShift を加えた実際のMIDIを返す
 function toActualMidi(baseMidi) {
   return baseMidi + transposeSemis + octaveShift * 12;
@@ -549,8 +594,28 @@ function playChordByDegree(degreeIndex) {
   // ① 構成音（base）を作る
   const baseMidis = intervals.map((iv) => rootBaseMidi + iv);
 
+  // ★左パネル表示（構成音）更新：表示は移調後の音名（C/E/Gなど）
+  const noteNames = baseMidis.map((m) =>
+    getNoteNameFromMidi(m, transposeSemis, currentKeyName),
+  );
+
+  // コード名ラベル（中央の表示と揃えるため degreeIndex から作る）
+  const rootName = getNoteNameFromMidi(
+    rootBaseMidi,
+    transposeSemis,
+    currentKeyName,
+  );
+  let suffix = "";
+  if (quality === "min") suffix = "m";
+  else if (quality === "dim") suffix = "dim";
+
+  updateLastChordPanel(`${rootName}${suffix}`, noteNames);
+
   // ② 実際の音程（actual）に変換して “保持点灯”
   const actualMidis = baseMidis.map(toActualMidi);
+  lastChordActualMidis = actualMidis.slice();
+  const arpBtn = document.getElementById("arpPlayBtn");
+  if (arpBtn) arpBtn.disabled = false;
   setReferenceHold(actualMidis);
 
   // ③ 音を鳴らす（既存の playNote を利用）
@@ -576,7 +641,22 @@ function playSeventhChordByDegree(degreeIndex) {
 
   const baseMidis = intervals.map((iv) => rootBaseMidi + iv);
 
+  // ★左パネル表示（構成音）更新
+  const noteNames = baseMidis.map((m) =>
+    getNoteNameFromMidi(m, transposeSemis, currentKeyName),
+  );
+
+  const rootName = getNoteNameFromMidi(
+    rootBaseMidi,
+    transposeSemis,
+    currentKeyName,
+  );
+  updateLastChordPanel(`${rootName}${suffixFor7(quality7)}`, noteNames);
+
   const actualMidis = baseMidis.map(toActualMidi);
+  lastChordActualMidis = actualMidis.slice();
+  const arpBtn = document.getElementById("arpPlayBtn");
+  if (arpBtn) arpBtn.disabled = false;
   setReferenceHold(actualMidis);
 
   baseMidis.forEach((m) => playNote(m));
@@ -769,6 +849,48 @@ function setupSeventhChordButtons() {
   });
 }
 
+function setupArpButton() {
+  const btn = document.getElementById("arpPlayBtn");
+  if (!btn) return;
+
+  function updateEnabled() {
+    btn.disabled =
+      !(lastChordActualMidis && lastChordActualMidis.length > 0) ||
+      isArpPlaying;
+  }
+
+  btn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    if (isArpPlaying) return;
+    if (!lastChordActualMidis || lastChordActualMidis.length === 0) return;
+
+    isArpPlaying = true;
+    updateEnabled();
+
+    // 0.5秒間隔で順番に鳴らす
+    const intervalMs = 500;
+    const seq = lastChordActualMidis.slice();
+
+    seq.forEach((midi, i) => {
+      setTimeout(() => {
+        playActualMidi(midi);
+      }, i * intervalMs);
+    });
+
+    // 再生終わったら解除（最後の音が鳴り始めてから少し待つ）
+    const totalMs = (seq.length - 1) * intervalMs + 30;
+    setTimeout(() => {
+      isArpPlaying = false;
+      updateEnabled();
+    }, totalMs);
+  });
+
+  // 初期状態
+  updateEnabled();
+
+  // 外から更新したい時用に関数を返す…は不要なので、ここはこれでOK
+}
+
 // 参照用ピアノ鍵盤を一瞬光らせる
 function flashReferenceKey(actualMidi) {
   const el = document.querySelector(`.ref-key[data-midi="${actualMidi}"]`);
@@ -857,4 +979,5 @@ window.addEventListener("DOMContentLoaded", () => {
   setupScaleModeButtons();
   setupInstrumentButtons();
   setupDurationSlider();
+  setupArpButton();
 });

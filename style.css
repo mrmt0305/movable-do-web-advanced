@@ -798,3 +798,78 @@ body {
   font-size: 0.75rem;
   opacity: 0.6;
 }
+
+/* =========================
+   Last Chord Notes Panel
+   ========================= */
+
+.chord-notes-panel {
+  margin-top: 12px;
+  width: 100%;
+  border-radius: 10px;
+  padding: 12px;
+  box-sizing: border-box;
+  background: rgba(0,0,0,0.12);
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+.last-chord-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 4px 0 10px;
+}
+
+.last-chord-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  opacity: 0.9;
+}
+
+.note-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.note-chip {
+  padding: 6px 10px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.08);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+}
+
+.chord-notes-hint {
+  margin-top: 10px;
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+.arp-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.18);
+  color: inherit;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 700;
+}
+
+.arp-btn:hover {
+  filter: brightness(1.06);
+}
+
+.arp-btn:active {
+  transform: translateY(2px) scale(0.99);
+}
+
+.arp-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
