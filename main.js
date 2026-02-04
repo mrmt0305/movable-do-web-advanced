@@ -7,6 +7,10 @@ let currentTone = _tone_0000_Aspirin_sf2_file; // 初期はピアノ
 let noteDuration = 1.5; // 一音の長さ（秒）
 let lastChordActualMidis = []; // 最後に選んだコードの構成音（実MIDI）
 let isArpPlaying = false; // 連打防止
+let bpm = 100;                 // 初期テンポ
+const BPM_MIN = 30;
+const BPM_MAX = 240;
+
 
 // 画面上にある鍵盤の「C基準」の MIDI
 const NOTE_LIST = [
@@ -775,20 +779,20 @@ function setupKeyboardControl() {
   });
 }
 
-// オクターブボタンのセットアップ
-function setupOctaveButtons() {
-  const downBtn = document.getElementById("octDownBtn");
-  const upBtn = document.getElementById("octUpBtn");
+// オクターブ変更ゾーンのセットアップ
+function setupOctaveZones() {
+  const left = document.getElementById("octZoneLeft");
+  const right = document.getElementById("octZoneRight");
 
-  if (downBtn) {
-    downBtn.addEventListener("click", (e) => {
+  if (left) {
+    left.addEventListener("pointerdown", (e) => {
       e.preventDefault();
       changeOctave(-1);
     });
   }
 
-  if (upBtn) {
-    upBtn.addEventListener("click", (e) => {
+  if (right) {
+    right.addEventListener("pointerdown", (e) => {
       e.preventDefault();
       changeOctave(+1);
     });
@@ -868,7 +872,8 @@ function setupArpButton() {
     updateEnabled();
 
     // 0.5秒間隔で順番に鳴らす
-    const intervalMs = 500;
+    const intervalMs = Math.round((60 / bpm) * 1000); // 4分音符間隔
+
     const seq = lastChordActualMidis.slice();
 
     seq.forEach((midi, i) => {
@@ -924,7 +929,7 @@ function setupInstrumentButtons() {
 
   const toneMap = {
     piano: _tone_0000_Aspirin_sf2_file,
-    guitar: _tone_0250_Acoustic_Guitar_sf2_file,
+    guitar: _tone_0250_GeneralUserGS_sf2_file,
     bass: _tone_0330_GeneralUserGS_sf2_file,
     harp: _tone_0460_GeneralUserGS_sf2_file,
     retro: _tone_0800_SoundBlasterOld_sf2,
@@ -965,6 +970,121 @@ function setupDurationSlider() {
   slider.addEventListener("input", () => apply(slider.value));
 }
 
+function clamp(n, min, max) {
+  return Math.max(min, Math.min(max, n));
+}
+
+function setBpm(newBpm) {
+  bpm = clamp(Math.round(newBpm), BPM_MIN, BPM_MAX);
+
+  const valueEl = document.getElementById("bpmValue");
+  const inputEl = document.getElementById("bpmInput");
+  if (valueEl) valueEl.textContent = String(bpm);
+  if (inputEl) inputEl.value = String(bpm);
+}
+
+function setupTempoControl() {
+  const downBtn = document.getElementById("bpmDownBtn");
+  const upBtn = document.getElementById("bpmUpBtn");
+  const display = document.getElementById("bpmDisplay");
+  const input = document.getElementById("bpmInput");
+
+  // 初期反映
+  setBpm(bpm);
+
+  // ±ボタン
+  if (downBtn) downBtn.addEventListener("click", (e) => { e.preventDefault(); setBpm(bpm - 1); });
+  if (upBtn) upBtn.addEventListener("click", (e) => { e.preventDefault(); setBpm(bpm + 1); });
+
+  // クリックで編集（inputを出す）
+  function openEdit() {
+    if (!input) return;
+    input.style.display = "block";
+    input.focus();
+    input.select();
+  }
+  function closeEdit() {
+    if (!input) return;
+    input.style.display = "none";
+  }
+
+  if (input) {
+    input.addEventListener("blur", () => {
+      setBpm(Number(input.value));
+      closeEdit();
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        setBpm(Number(input.value));
+        closeEdit();
+      }
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeEdit();
+        setBpm(bpm); // 表示を戻す（念のため）
+      }
+    });
+
+    input.addEventListener("input", () => {
+      // 入力中も表示に反映（好みで外してOK）
+      setBpm(Number(input.value));
+    });
+  }
+
+  // ドラッグで調整：押して左右にドラッグするとBPM増減
+  if (display) {
+    let startX = 0;
+    let startBpm = 100;
+    let dragging = false;
+    let pointerId = null;
+
+    // 感度：5px動いたら1BPM変更（好みで調整OK）
+    const PX_PER_BPM = 5;
+
+    display.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      pointerId = e.pointerId;
+      display.setPointerCapture(pointerId);
+
+      startX = e.clientX;
+      startBpm = bpm;
+      dragging = false;
+    });
+
+    display.addEventListener("pointermove", (e) => {
+      if (pointerId == null) return;
+      const dx = e.clientX - startX;
+
+      if (Math.abs(dx) > 3) dragging = true;
+
+      if (dragging) {
+        const delta = dx / PX_PER_BPM;
+        setBpm(startBpm + delta);
+      }
+    });
+
+    display.addEventListener("pointerup", (e) => {
+      if (pointerId == null) return;
+
+      // ドラッグしてなければ「クリック」とみなして編集モードへ
+      if (!dragging) {
+        openEdit();
+      }
+
+      try { display.releasePointerCapture(pointerId); } catch (_) {}
+      pointerId = null;
+      dragging = false;
+    });
+
+    display.addEventListener("pointercancel", () => {
+      pointerId = null;
+      dragging = false;
+    });
+  }
+}
+
 // ページ読み込み時にセットアップ
 window.addEventListener("DOMContentLoaded", () => {
   initAudio();
@@ -974,10 +1094,11 @@ window.addEventListener("DOMContentLoaded", () => {
   setupTransposeButtons();
   setupChordButtons();
   setupSeventhChordButtons();
-  setupOctaveButtons();
+  setupOctaveZones();
   updateOctaveLabel();
   setupScaleModeButtons();
   setupInstrumentButtons();
   setupDurationSlider();
   setupArpButton();
+  setupTempoControl();
 });

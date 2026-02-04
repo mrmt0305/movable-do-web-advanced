@@ -873,3 +873,136 @@ body {
   opacity: 0.45;
   cursor: not-allowed;
 }
+
+/* =========================
+   Arp / Tempo Panel
+   ========================= */
+
+.arp-panel {
+  margin-top: 12px;
+  width: 100%;
+  border-radius: 10px;
+  padding: 12px;
+  box-sizing: border-box;
+  background: rgba(0,0,0,0.12);
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+.tempo-row {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  gap: 10px;
+  align-items: center;
+}
+
+/* BPM ± ボタン */
+.bpm-btn {
+  width: 40px;
+  height: 38px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.18);
+  color: inherit;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 800;
+}
+
+.bpm-btn:hover { filter: brightness(1.06); }
+.bpm-btn:active { transform: translateY(2px) scale(0.99); }
+
+/* BPM 表示 */
+.bpm-display {
+  height: 38px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: ew-resize; /* ドラッグを示す */
+  user-select: none;
+}
+
+.bpm-value {
+  font-size: 1.05rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.bpm-unit {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  font-weight: 800;
+}
+
+/* クリック編集用 input（普段は隠す） */
+.bpm-input {
+  display: none;
+  margin-top: 10px;
+  width: 100%;
+  height: 38px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.18);
+  color: inherit;
+  padding: 0 12px;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.tempo-hint {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+/* arp-btn は前に作ってる前提。未定義ならこれも残してOK */
+.arp-btn {
+  margin-top: 6px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.18);
+  color: inherit;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 800;
+}
+
+.arp-btn:hover { filter: brightness(1.06); }
+.arp-btn:active { transform: translateY(2px) scale(0.99); }
+.arp-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* =========================
+   Octave click zones (left/right 5%)
+   ========================= */
+
+.piano {
+  position: relative; /* すでにあるけど念のため */
+}
+
+/* 透明のクリック領域 */
+.oct-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 5%;
+  z-index: 20;
+  cursor: pointer;
+  user-select: none;
+  /* 透明のまま。デバッグしたい時は↓を一時的に有効化 */
+  /* background: rgba(255, 255, 255, 0.05); */
+}
+
+.oct-zone-left { left: 0; }
+.oct-zone-right { right: 0; }
+
+/* クリックできることが分かるように、ホバー時だけ薄く反応（好み） */
+.oct-zone:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
