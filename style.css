@@ -855,3 +855,74 @@ footer {
 footer a {
   color: rgba(243, 231, 215, 0.7) !important;
 }
+
+/* =========================
+   Theory Panel (right side)
+   ========================= */
+
+.theory-panel{
+  width: 100%;
+  border-radius: 10px;
+  padding: 12px;
+  box-sizing: border-box;
+  background: rgba(0,0,0,0.12);
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+.theory-wheel{
+  margin-top: 10px;
+  width: 100%;
+  max-width: 320px;     /* 右パネル内での最大サイズ */
+  aspect-ratio: 1 / 1;  /* 正方形を維持 */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.theory-wheel svg{
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ドーナツの各セグメント */
+.wheel-seg{
+  fill: rgba(0,0,0,0.22);
+  stroke: rgba(255,255,255,0.85);
+  stroke-width: 3;
+}
+
+/* 中抜きリング（外枠＆内枠っぽさを出す） */
+.wheel-ring{
+  fill: none;
+  stroke: rgba(255,255,255,0.95);
+  stroke-width: 6;
+}
+
+/* ドーナツの各セグメント */
+.wheel-seg{
+  fill: url(#segBlack);
+  stroke: rgba(255,255,255,0.85);
+  stroke-width: 3;
+}
+
+.wheel-seg.is-scale{
+  fill: url(#segWhite);
+}
+
+/* ===== スケール外（黒鍵側） ===== */
+.wheel-text {
+  fill: rgba(229, 231, 235, 0.55);   /* 少し薄く */
+  font-weight: 600;
+  font-size: 16px;                 /* 小さめ */
+  letter-spacing: 0.02em;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  transition: all 0.15s ease;
+}
+
+/* ===== スケール内（白鍵側） ===== */
+.wheel-text.is-scale {
+  fill: #374151;                   /* はっきり */
+  font-weight: 900;
+  font-size: 20px;                 /* 大きめ */
+}

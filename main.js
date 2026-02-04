@@ -466,6 +466,7 @@ function applyKeyAndMode() {
   updateKeyLabelsForTranspose();
   updatePlayableRange();
   updateRefPianoOctaveNumbersOnly();
+  updateTheoryWheelScaleHighlight();
   clearReferenceHold();
 }
 
@@ -971,4 +972,207 @@ async function startApp() {
 window.addEventListener("DOMContentLoaded", () => {
   lockUI();
   setupStartCard();
+});
+
+/* =========================
+ * Theory wheel SVG
+ * ========================= */
+
+// 極座標→デカルト座標変換
+function polarToCartesian(cx, cy, r, deg) {
+  const rad = (deg * Math.PI) / 180;
+  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+}
+
+// リング（ドーナツ状の扇形）パスを作る
+function describeRingSegment(cx, cy, rOuter, rInner, startDeg, endDeg) {
+  const p1 = polarToCartesian(cx, cy, rOuter, startDeg);
+  const p2 = polarToCartesian(cx, cy, rOuter, endDeg);
+  const p3 = polarToCartesian(cx, cy, rInner, endDeg);
+  const p4 = polarToCartesian(cx, cy, rInner, startDeg);
+
+  const largeArc = (endDeg - startDeg) % 360 > 180 ? 1 : 0;
+
+  return [
+    `M ${p1.x} ${p1.y}`,
+    `A ${rOuter} ${rOuter} 0 ${largeArc} 1 ${p2.x} ${p2.y}`,
+    `L ${p3.x} ${p3.y}`,
+    `A ${rInner} ${rInner} 0 ${largeArc} 0 ${p4.x} ${p4.y}`,
+    "Z",
+  ].join(" ");
+}
+
+function buildTheoryWheel(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  // Aを12時に、時計回り
+  const labels = [
+    "A",
+    "A#",
+    "B",
+    "C",
+    "C#",
+    "D",
+    "D#",
+    "E",
+    "F",
+    "F#",
+    "G",
+    "G#",
+  ];
+
+  const size = 360;
+  const cx = size / 2;
+  const cy = size / 2;
+  const rOuter = 160;
+  const rInner = 95;
+
+  const svgNS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(svgNS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${size} ${size}`);
+
+    // ===== SVG gradients (defs) =====
+  const defs = document.createElementNS(svgNS, "defs");
+
+  // 黒鍵っぽいグラデ
+  const segBlack = document.createElementNS(svgNS, "radialGradient");
+  segBlack.setAttribute("id", "segBlack");
+  segBlack.setAttribute("cx", "20%");
+  segBlack.setAttribute("cy", "0%");
+  segBlack.setAttribute("r", "120%");
+
+  const b1 = document.createElementNS(svgNS, "stop");
+  b1.setAttribute("offset", "0%");
+  b1.setAttribute("stop-color", "#374151");
+  const b2 = document.createElementNS(svgNS, "stop");
+  b2.setAttribute("offset", "100%");
+  b2.setAttribute("stop-color", "#020617");
+
+  segBlack.appendChild(b1);
+  segBlack.appendChild(b2);
+
+  // 白鍵っぽいグラデ
+  const segWhite = document.createElementNS(svgNS, "linearGradient");
+  segWhite.setAttribute("id", "segWhite");
+  segWhite.setAttribute("x1", "0%");
+  segWhite.setAttribute("y1", "0%");
+  segWhite.setAttribute("x2", "0%");
+  segWhite.setAttribute("y2", "100%");
+
+  const w1 = document.createElementNS(svgNS, "stop");
+  w1.setAttribute("offset", "0%");
+  w1.setAttribute("stop-color", "#f9fafb");
+  const w2 = document.createElementNS(svgNS, "stop");
+  w2.setAttribute("offset", "100%");
+  w2.setAttribute("stop-color", "#e5e7eb");
+
+  segWhite.appendChild(w1);
+  segWhite.appendChild(w2);
+
+  defs.appendChild(segBlack);
+  defs.appendChild(segWhite);
+  svg.appendChild(defs);
+  // ================================
+
+  // 外周＆内周のリング（白い縁取り）
+  const outerRing = document.createElementNS(svgNS, "circle");
+  outerRing.setAttribute("cx", cx);
+  outerRing.setAttribute("cy", cy);
+  outerRing.setAttribute("r", rOuter);
+  outerRing.setAttribute("class", "wheel-ring");
+  svg.appendChild(outerRing);
+
+  const innerRing = document.createElementNS(svgNS, "circle");
+  innerRing.setAttribute("cx", cx);
+  innerRing.setAttribute("cy", cy);
+  innerRing.setAttribute("r", rInner);
+  innerRing.setAttribute("class", "wheel-ring");
+  svg.appendChild(innerRing);
+
+  const segAngle = 360 / labels.length;
+
+  // Aを12時に置くため、開始角を「-90度」(上方向) にする
+  // 1セグメントの中心が-90度になるように、半分戻す
+  const baseStart = -90 - segAngle / 2;
+
+  labels.forEach((label, i) => {
+    const start = baseStart + segAngle * i;
+    const end = start + segAngle;
+
+    const path = document.createElementNS(svgNS, "path");
+    path.setAttribute(
+      "d",
+      describeRingSegment(cx, cy, rOuter, rInner, start, end),
+    );
+    path.setAttribute("class", "wheel-seg");
+    path.dataset.note = label;
+    svg.appendChild(path);
+
+    // 文字位置：セグメントの中央角度、半径は内外の中間
+    const mid = (start + end) / 2;
+    const rText = (rOuter + rInner) / 2;
+    const pText = polarToCartesian(cx, cy, rText, mid);
+
+    const text = document.createElementNS(svgNS, "text");
+    text.setAttribute("x", pText.x);
+    text.setAttribute("y", pText.y);
+    text.setAttribute("class", "wheel-text");
+    text.textContent = label;
+    svg.appendChild(text);
+  });
+
+  container.innerHTML = "";
+  container.appendChild(svg);
+}
+
+function normalizeLabelToSharp(label) {
+  // ドーナツは #表記で統一しているので、♭で来たら #に寄せる
+  const flatToSharp = {
+    "D♭": "C#",
+    "E♭": "D#",
+    "G♭": "F#",
+    "A♭": "G#",
+    "B♭": "A#",
+  };
+  return flatToSharp[label] || label;
+}
+
+function getScalePitchClasses(keyName, mode) {
+  const keySharp = normalizeLabelToSharp(keyName);
+
+  // NOTE_NAMES_SHARP は既にあなたのJSにある前提
+  const rootPc = NOTE_NAMES_SHARP.indexOf(keySharp);
+  if (rootPc < 0) return [];
+
+  // メジャー/ナチュラルマイナー
+  const intervals =
+    mode === "minor" ? [0, 2, 3, 5, 7, 8, 10] : [0, 2, 4, 5, 7, 9, 11];
+
+  return intervals.map((iv) => (rootPc + iv) % 12);
+}
+
+function updateTheoryWheelScaleHighlight() {
+  const pcs = getScalePitchClasses(currentKeyName, scaleMode);
+  const allowed = new Set(pcs.map((pc) => NOTE_NAMES_SHARP[pc]));
+
+  document.querySelectorAll("#theoryWheel .wheel-seg").forEach((seg) => {
+    const note = seg.dataset.note;
+    const isScale = allowed.has(note);
+
+    // 部屋の色切り替え
+    seg.classList.toggle("is-scale", isScale);
+
+    // 対応する文字も一緒に切り替え
+    const text = seg.nextSibling; // すぐ後にtext置いてる構造ならこれでOK
+    if (text && text.classList) {
+      text.classList.toggle("is-scale", isScale);
+    }
+  });
+}
+
+// DOM読み込み後に描画（Start前でもOKな「ただの図」なのでここで）
+window.addEventListener("DOMContentLoaded", () => {
+  buildTheoryWheel("theoryWheel");
+  updateTheoryWheelScaleHighlight();
 });
