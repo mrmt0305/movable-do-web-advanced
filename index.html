@@ -81,8 +81,12 @@
 
         <!-- メインコンテンツ -->
         <main class="center-panel">
-            <h1>移調ピアノ(上級)</h1>
-            <p>クリック or キーボード操作で移調できます。<br>※ ブラウザの仕様で、最初のクリック時に音が鳴るまで少しだけタイムラグが出ることがあります。</p>
+                <h1>移調ピアノ(上級)</h1>
+            <div id="uiLock" class="ui-lock" aria-hidden="false">
+                <div class="ui-lock-card start-card" id="startCard">
+                    開始
+                </div>
+            </div>
             <div class="piano">
                 <!-- 鍵盤部分 -->
                 <div class="piano-inner">

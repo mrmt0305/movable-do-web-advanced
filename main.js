@@ -186,6 +186,92 @@ const NOTE_NAMES_FLAT = [
   "B",
 ];
 
+let appStarted = false;
+
+// 「使えるようにする」タイミングを Start 後にするため、DOMLoaded では各種setupを呼ばない
+function lockUI() {
+  const lock = document.getElementById("uiLock");
+  if (lock) lock.style.display = "flex";
+}
+
+function unlockUI() {
+  const lock = document.getElementById("uiLock");
+  if (lock) lock.style.display = "none";
+}
+
+// 無音でプリロード：全tone × 代表ノートをqueue
+function preloadAllTones() {
+  // あなたの toneMap をここで再利用（setupInstrumentButtons内のと一致させる）
+  const toneMap = {
+    piano: _tone_0000_Aspirin_sf2_file,
+    guitar: _tone_0250_GeneralUserGS_sf2_file,
+    bass: _tone_0330_GeneralUserGS_sf2_file,
+    harp: _tone_0460_GeneralUserGS_sf2_file,
+    retro: _tone_0800_SoundBlasterOld_sf2,
+    violin: _tone_0400_GeneralUserGS_sf2_file,
+  };
+
+  const tones = Object.values(toneMap);
+
+  // 代表MIDI（軽め）
+  const testMidis = [60, 64, 67]; // C4/E4/G4
+  const now = audioCtx.currentTime;
+  const duration = 0.02;
+  const volume = 0.0; // ←「小さく鳴らす」をやめたいなら 0 にする
+
+  // queueWaveTable を投げるだけ（デコード/準備を促す）
+  tones.forEach((tone) => {
+    testMidis.forEach((midi) => {
+      player.queueWaveTable(audioCtx, audioCtx.destination, tone, now, midi, duration, volume);
+    });
+  });
+}
+
+async function startApp() {
+  if (appStarted) return;
+
+  initAudio();
+
+  // ユーザー操作内でresume（これが重要）
+  if (audioCtx.state === "suspended") {
+    await audioCtx.resume();
+  }
+
+  // プリロード
+  preloadAllTones();
+
+  // ここで初めて各種機能を有効化（イベントattach）
+  attachKeyEvents();
+  setupKeyboardControl();
+  setupTransposeButtons();
+  setupChordButtons();
+  setupSeventhChordButtons();
+  setupOctaveEdgeClick();
+  updateOctaveLabel();
+  setupScaleModeButtons();
+  setupInstrumentButtons();
+  setupDurationSlider();
+  setupArpButton();
+  setupTempoControl();
+  updateRefPianoOctaveNumbersOnly();
+
+  appStarted = true;
+  unlockUI();
+
+  const btn = document.getElementById("startBtn");
+  if (btn) btn.disabled = true;
+}
+
+function setupStartCard() {
+  const card = document.getElementById("startCard");
+  if (!card) return;
+
+  card.addEventListener("click", (e) => {
+    e.preventDefault();
+    startApp();
+  });
+}
+
 // 現在のKey名から、#系か♭系かをざっくり決める
 function shouldUseFlatNames(keyName) {
   // Keyボタンが D♭, E♭, G♭, A♭, B♭ のように♭を含むなら♭表記優先
@@ -520,30 +606,6 @@ function initAudio() {
   }
 }
 
-// すべての音を「ほぼ聞こえない音量」で一瞬鳴らしてウォームアップ
-function warmupNotes() {
-  if (!audioCtx || !player || warmedUp) return;
-
-  const now = audioCtx.currentTime;
-  const duration = 0.01;
-  const volume = 0.0001;
-
-  NOTE_LIST.forEach((baseMidi) => {
-    player.queueWaveTable(
-      audioCtx,
-      audioCtx.destination,
-      currentTone,
-      now,
-      baseMidi,
-      duration,
-      volume,
-    );
-  });
-
-  warmedUp = true;
-  console.log("ウォームアップ完了");
-}
-
 // baseMidi: C基準のMIDI（例: C4=60, C#4=61,...）
 function playNote(baseMidi) {
   initAudio();
@@ -718,21 +780,6 @@ function attachKeyEvents() {
     keyEl.addEventListener("touchend", stopPlay);
     keyEl.addEventListener("touchcancel", stopPlay);
   });
-}
-
-// 最初のユーザー操作で AudioContext を resume & 全音ウォームアップ
-function setupFirstInteractionWarmup() {
-  const handler = async () => {
-    initAudio();
-    if (audioCtx.state === "suspended") {
-      await audioCtx.resume();
-    }
-    warmupNotes();
-
-    window.removeEventListener("pointerdown", handler);
-  };
-
-  window.addEventListener("pointerdown", handler);
 }
 
 // キーボード操作の設定
@@ -1115,21 +1162,7 @@ function setupTempoControl() {
   }
 }
 
-// ページ読み込み時にセットアップ
 window.addEventListener("DOMContentLoaded", () => {
-  initAudio();
-  attachKeyEvents();
-  setupFirstInteractionWarmup();
-  setupKeyboardControl();
-  setupTransposeButtons();
-  setupChordButtons();
-  setupSeventhChordButtons();
-  setupOctaveEdgeClick();
-  updateOctaveLabel();
-  setupScaleModeButtons();
-  setupInstrumentButtons();
-  setupDurationSlider();
-  setupArpButton();
-  setupTempoControl();
-  updateRefPianoOctaveNumbersOnly();
+  lockUI();
+  setupStartCard();
 });
