@@ -204,6 +204,34 @@ function getNoteNameFromMidi(baseMidi, transposeSemi, keyName) {
 
   return table[pitchClass];
 }
+// MIDI → オクターブ番号（C4=60 → 4）
+function midiToOctaveNumber(midi) {
+  return Math.floor(midi / 12) - 1;
+}
+
+// 参照用ピアノ（固定表記）の「オクターブ数字だけ」を更新
+function updateRefPianoOctaveNumbersOnly() {
+  document.querySelectorAll(".ref-key").forEach((keyEl) => {
+    const baseMidi = Number(keyEl.dataset.midi);
+    const span = keyEl.querySelector("span");
+    if (!span) return;
+
+    // 初回だけ「固定表記テンプレ」を保存（例: "C4" / "A#3<br>B♭3"）
+    if (!keyEl.dataset.fixedLabelHtml) {
+      keyEl.dataset.fixedLabelHtml = span.innerHTML;
+    }
+
+    // 実際に鳴っているMIDI（移調 + オクターブ）
+    const actualMidi = baseMidi + transposeSemis + octaveShift * 12;
+    const octave = midiToOctaveNumber(actualMidi);
+
+    // テンプレ内の数字部分だけを新オクターブに置換
+    // 例: "C4" → "C5"
+    // 例: "A#3<br>B♭3" → "A#4<br>B♭4"
+    const template = keyEl.dataset.fixedLabelHtml;
+    span.innerHTML = template.replace(/\d+/g, String(octave));
+  });
+}
 
 // メジャー / マイナーに応じて、「キーボードで叩ける範囲」を変更してグレー付け
 function updatePlayableRange() {
@@ -350,6 +378,7 @@ function applyKeyAndMode() {
   updateDegreeButtonTexts();
   updateKeyLabelsForTranspose();
   updatePlayableRange();
+  updateRefPianoOctaveNumbersOnly();
   clearReferenceHold();
   console.log(
     "Transpose semis:",
@@ -465,6 +494,7 @@ function changeOctave(delta) {
   octaveShift = newVal;
   console.log("Octave:", octaveShift);
   updateOctaveLabel();
+  updateRefPianoOctaveNumbersOnly();
 }
 
 // オクターブ表示ラベル更新
@@ -1109,4 +1139,5 @@ window.addEventListener("DOMContentLoaded", () => {
   setupDurationSlider();
   setupArpButton();
   setupTempoControl();
+  updateRefPianoOctaveNumbersOnly();
 });
