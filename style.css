@@ -1087,3 +1087,215 @@ body {
 .oct-zone:active {
   background: rgba(37, 99, 235, 0.28);
 }
+
+/* =========================
+   Arp title + BPM layout
+   ========================= */
+
+.arp-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* BPM全体 */
+.arp-bpm {
+  font-size: 0.7rem;      /* 少し小さく */
+  opacity: 0.75;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+/* 数値部分だけ少し強調 */
+.bpm-value {
+  font-weight: 700;
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+/* 編集用input */
+#bpmInput {
+  width: 52px;
+  background: #020617;
+  color: #e5e7eb;
+  border: 1px solid #4b5563;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  padding: 2px 4px;
+}
+
+.arp-bpm {
+  color: #9ca3af;
+}
+
+.bpm-value {
+  color: #e5e7eb;
+}
+
+/* タイトル行：左右に分ける */
+.arp-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* BPMコントロール全体（コンパクト） */
+.bpm-ctrl {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 矢印ボタン：枠なし・小さめ */
+.bpm-arrow {
+  width: 28px;
+  height: 26px;
+  border: none;              /* 枠なし */
+  background: rgba(0,0,0,0.18);
+  color: inherit;
+  border-radius: 9999px;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 800;
+  padding: 0;
+}
+
+.bpm-arrow:hover { filter: brightness(1.06); }
+.bpm-arrow:active { transform: translateY(1px) scale(0.99); }
+
+/* BPM表示：小さめ・ドラッグ可能 */
+.bpm-display {
+  height: 26px;
+  padding: 0 10px;
+  border: none;              /* 枠なし */
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.08);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: ns-resize;
+  user-select: none;
+}
+
+.bpm-num {
+  font-size: 0.85rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.bpm-unit {
+  font-size: 0.7rem;
+  opacity: 0.7;
+  font-weight: 800;
+}
+
+/* 入力欄：表示時だけ下に出す（タイトル行を崩さない） */
+.bpm-input {
+  display: none;
+  position: absolute;
+  margin-top: 6px;
+  right: 0;
+  top: 100%;
+  width: 84px;
+  height: 28px;
+  border-radius: 8px;
+  border: none;              /* 枠なし */
+  background: rgba(0,0,0,0.25);
+  color: inherit;
+  padding: 0 10px;
+  box-sizing: border-box;
+  outline: none;
+}
+
+/* タイトル行内で input を浮かせるため */
+.bpm-ctrl {
+  position: relative;
+}
+
+/* インラインBPM入力（表示と同じ見た目） */
+.bpm-inline-input {
+  width: 48px;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-weight: 900;
+  font-size: 0.85rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  cursor: text;
+}
+
+/* フォーカス時だけ軽く分かるように */
+.bpm-inline-input:focus {
+  background: rgba(255,255,255,0.12);
+  border-radius: 6px;
+}
+
+/* =========================
+   Arp panel: button + bpm + repeat
+   ========================= */
+
+.arp-actions {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1fr auto; /* 左：大きいボタン / 右：BPM+繰り返し */
+  gap: 10px;
+  align-items: center;
+}
+
+/* 右側（BPM一式 + 繰り返し）を横並び */
+.arp-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+}
+
+/* arp-btn は左で伸びる（既存の width:100% をここで上書き） */
+.arp-actions .arp-btn {
+  width: 100%;
+  margin-top: 0; /* 既存に margin-top があるなら打ち消し */
+}
+
+/* BPM一式はコンパクト維持（既存のbpm-ctrl系CSSがあればそれを活かす） */
+.arp-actions .bpm-ctrl {
+  flex: 0 0 auto;
+}
+
+/* 繰り返しボタン（見た目だけ） */
+.repeat-btn {
+  height: 26px;
+  padding: 0 12px;
+  border-radius: 9999px;
+  border: none; /* 枠なし */
+  background: rgba(0, 0, 0, 0.18);
+  color: inherit;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 800;
+}
+
+.repeat-btn:hover { filter: brightness(1.06); }
+.repeat-btn:active { transform: translateY(1px) scale(0.99); }
+
+/* 画面が狭い時は縦積みに（UI崩れ防止） */
+@media (max-width: 520px) {
+  .arp-actions {
+    grid-template-columns: 1fr;
+  }
+  .arp-right {
+    justify-content: flex-start;
+  }
+}
+
+/* もともと ew-resize なら */
+.bpm-display {
+  cursor: ns-resize; /* 上下ドラッグっぽいカーソル */
+}

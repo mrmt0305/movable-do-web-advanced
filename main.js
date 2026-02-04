@@ -7,10 +7,9 @@ let currentTone = _tone_0000_Aspirin_sf2_file; // 初期はピアノ
 let noteDuration = 1.5; // 一音の長さ（秒）
 let lastChordActualMidis = []; // 最後に選んだコードの構成音（実MIDI）
 let isArpPlaying = false; // 連打防止
-let bpm = 100;                 // 初期テンポ
+let bpm = 100; // 初期テンポ
 const BPM_MIN = 30;
 const BPM_MAX = 240;
-
 
 // 画面上にある鍵盤の「C基準」の MIDI
 const NOTE_LIST = [
@@ -814,27 +813,31 @@ function setupOctaveEdgeClick() {
   const piano = document.querySelector(".piano");
   if (!piano) return;
 
-  piano.addEventListener("pointerdown", (e) => {
-    // クリック位置を .piano 内の割合で判定
-    const rect = piano.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const ratio = x / rect.width;
+  piano.addEventListener(
+    "pointerdown",
+    (e) => {
+      // クリック位置を .piano 内の割合で判定
+      const rect = piano.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const ratio = x / rect.width;
 
-    // 左右5%のみ反応
-    if (ratio <= 0.05) {
-      // 端クリックは鍵盤の「発音」までいかないようにしたいなら preventDefault
-      e.preventDefault();
-      changeOctave(-1);
-      return;
-    }
-    if (ratio >= 0.95) {
-      e.preventDefault();
-      changeOctave(+1);
-      return;
-    }
+      // 左右5%のみ反応
+      if (ratio <= 0.05) {
+        // 端クリックは鍵盤の「発音」までいかないようにしたいなら preventDefault
+        e.preventDefault();
+        changeOctave(-1);
+        return;
+      }
+      if (ratio >= 0.95) {
+        e.preventDefault();
+        changeOctave(+1);
+        return;
+      }
 
-    // 中央は何もしない（鍵盤ボタン側が通常通り処理）
-  }, { passive: false });
+      // 中央は何もしない（鍵盤ボタン側が通常通り処理）
+    },
+    { passive: false },
+  );
 }
 
 // 移調ボタンのセットアップ
@@ -1015,65 +1018,57 @@ function clamp(n, min, max) {
 function setBpm(newBpm) {
   bpm = clamp(Math.round(newBpm), BPM_MIN, BPM_MAX);
 
-  const valueEl = document.getElementById("bpmValue");
-  const inputEl = document.getElementById("bpmInput");
-  if (valueEl) valueEl.textContent = String(bpm);
-  if (inputEl) inputEl.value = String(bpm);
+  const inputEl = document.getElementById("bpmValue");
+  if (inputEl) {
+    inputEl.value = String(bpm);
+  }
 }
 
 function setupTempoControl() {
   const downBtn = document.getElementById("bpmDownBtn");
   const upBtn = document.getElementById("bpmUpBtn");
   const display = document.getElementById("bpmDisplay");
-  const input = document.getElementById("bpmInput");
+  const input = document.getElementById("bpmValue");
 
-  // 初期反映
   setBpm(bpm);
 
-  // ±ボタン
-  if (downBtn) downBtn.addEventListener("click", (e) => { e.preventDefault(); setBpm(bpm - 1); });
-  if (upBtn) upBtn.addEventListener("click", (e) => { e.preventDefault(); setBpm(bpm + 1); });
-
-  // クリックで編集（inputを出す）
-  function openEdit() {
-    if (!input) return;
-    input.style.display = "block";
-    input.focus();
-    input.select();
-  }
-  function closeEdit() {
-    if (!input) return;
-    input.style.display = "none";
-  }
-
-  if (input) {
-    input.addEventListener("blur", () => {
-      setBpm(Number(input.value));
-      closeEdit();
+  // 矢印
+  if (downBtn)
+    downBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      setBpm(bpm - 1);
     });
 
+  if (upBtn)
+    upBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      setBpm(bpm + 1);
+    });
+
+  // 直接入力：changeで反映
+  if (input) {
+    input.addEventListener("change", () => {
+      setBpm(Number(input.value));
+    });
+
+    // Enterで確定したい場合（任意）
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
-        setBpm(Number(input.value));
-        closeEdit();
-      }
-      if (e.key === "Escape") {
-        e.preventDefault();
-        closeEdit();
-        setBpm(bpm); // 表示を戻す（念のため）
+        input.blur();
       }
     });
 
-    input.addEventListener("input", () => {
-      // 入力中も表示に反映（好みで外してOK）
-      setBpm(Number(input.value));
+    // ★重要：クリックしたら確実にフォーカス
+    input.addEventListener("pointerdown", (e) => {
+      e.stopPropagation(); // display側に伝播させない（ドラッグ開始を防ぐ）
     });
   }
 
-  // ドラッグで調整：押して左右にドラッグするとBPM増減
+  // ドラッグ操作（displayで行う）
+  // ドラッグ操作（縦方向でBPM増減）
   if (display) {
-    let startX = 0;
+    let startY = 0;
     let startBpm = 100;
     let dragging = false;
     let pointerId = null;
@@ -1086,32 +1081,29 @@ function setupTempoControl() {
       pointerId = e.pointerId;
       display.setPointerCapture(pointerId);
 
-      startX = e.clientX;
+      startY = e.clientY;
       startBpm = bpm;
       dragging = false;
     });
 
     display.addEventListener("pointermove", (e) => {
       if (pointerId == null) return;
-      const dx = e.clientX - startX;
 
-      if (Math.abs(dx) > 3) dragging = true;
+      const dy = e.clientY - startY;
+
+      if (Math.abs(dy) > 3) dragging = true;
 
       if (dragging) {
-        const delta = dx / PX_PER_BPM;
+        // 上にドラッグでBPM↑、下にドラッグでBPM↓（符号を反転）
+        const delta = -dy / PX_PER_BPM;
         setBpm(startBpm + delta);
       }
     });
 
-    display.addEventListener("pointerup", (e) => {
-      if (pointerId == null) return;
-
-      // ドラッグしてなければ「クリック」とみなして編集モードへ
-      if (!dragging) {
-        openEdit();
-      }
-
-      try { display.releasePointerCapture(pointerId); } catch (_) {}
+    display.addEventListener("pointerup", () => {
+      try {
+        display.releasePointerCapture(pointerId);
+      } catch {}
       pointerId = null;
       dragging = false;
     });
