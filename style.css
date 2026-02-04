@@ -926,3 +926,20 @@ footer a {
   font-weight: 900;
   font-size: 20px;                 /* 大きめ */
 }
+
+/* 中央のコード名（背景ウォーターマーク風） */
+.wheel-center-text{
+  fill: rgba(243, 231, 215, 0.18);   /* かなり薄く */
+  font-weight: 900;
+  font-size: 42px;                 /* 少し大きめで存在感は残す */
+  letter-spacing: 0.08em;
+  dominant-baseline: middle;
+  text-anchor: middle;
+  pointer-events: none;
+
+  /* くっきりさせず、溶け込ませる */
+  filter: blur(0.3px);
+
+  /* 縁取りは消す（目立つ原因） */
+  stroke: none;
+}

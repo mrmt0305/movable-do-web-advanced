@@ -303,7 +303,7 @@ function suffixFor7(quality7) {
 }
 
 /* =========================
- * Degree / Chord helpers (重複削減の核)
+ * Degree / Chord helpers
  * ========================= */
 
 // degree(0..6) から rootOffset / triadQuality / seventhQuality を取得
@@ -347,6 +347,8 @@ function buildChordData(degreeIndex, kind) {
     const noteNames = baseMidis.map((m) =>
       getNoteNameFromMidi(m, transposeSemis, currentKeyName),
     );
+    drawTheoryWheelChordLines(noteNames);
+    drawTheoryWheelChordPolygon(noteNames);
     const actualMidis = baseMidis.map(toActualMidi);
 
     return { label, noteNames, baseMidis, actualMidis };
@@ -367,6 +369,8 @@ function buildChordData(degreeIndex, kind) {
   const noteNames = baseMidis.map((m) =>
     getNoteNameFromMidi(m, transposeSemis, currentKeyName),
   );
+  drawTheoryWheelChordLines(noteNames);
+  drawTheoryWheelChordPolygon(noteNames);
   const actualMidis = baseMidis.map(toActualMidi);
 
   return { label, noteNames, baseMidis, actualMidis };
@@ -587,7 +591,7 @@ function playChord(kind, degreeIndex) {
   const data = buildChordData(degreeIndex, kind);
 
   updateLastChordPanel(data.label, data.noteNames);
-
+  setTheoryWheelCenterChordLabel(data.label);
   lastChordActualMidis = data.actualMidis.slice();
 
   const arpBtn = document.getElementById("arpPlayBtn");
@@ -930,6 +934,12 @@ function setupTempoControl() {
   }
 }
 
+function setTheoryWheelCenterChordLabel(label) {
+  const el = document.getElementById("centerChordText");
+  if (!el) return;
+  el.textContent = label || "";
+}
+
 /* =========================
  * App start
  * ========================= */
@@ -1032,8 +1042,18 @@ function buildTheoryWheel(containerId) {
   const svg = document.createElementNS(svgNS, "svg");
   svg.setAttribute("viewBox", `0 0 ${size} ${size}`);
 
-    // ===== SVG gradients (defs) =====
+  // ===== SVG gradients (defs) =====
   const defs = document.createElementNS(svgNS, "defs");
+
+  // コード線用グループ（毎回ここを描き直す）
+  const chordLinesGroup = document.createElementNS(svgNS, "g");
+  chordLinesGroup.setAttribute("id", "chordLines");
+  svg.appendChild(chordLinesGroup);
+
+  // コード面（多角形）用グループ
+  const chordPolyGroup = document.createElementNS(svgNS, "g");
+  chordPolyGroup.setAttribute("id", "chordPoly");
+  svg.appendChild(chordPolyGroup);
 
   // 黒鍵っぽいグラデ
   const segBlack = document.createElementNS(svgNS, "radialGradient");
@@ -1090,6 +1110,19 @@ function buildTheoryWheel(containerId) {
   innerRing.setAttribute("class", "wheel-ring");
   svg.appendChild(innerRing);
 
+  // ===== 中央：コード名表示 =====
+  const centerGroup = document.createElementNS(svgNS, "g");
+  centerGroup.setAttribute("id", "centerLabel");
+  svg.appendChild(centerGroup);
+
+  const centerText = document.createElementNS(svgNS, "text");
+  centerText.setAttribute("id", "centerChordText");
+  centerText.setAttribute("x", cx);
+  centerText.setAttribute("y", cy);
+  centerText.setAttribute("class", "wheel-center-text");
+  centerText.textContent = ""; // 初期は空
+  centerGroup.appendChild(centerText);
+
   const segAngle = 360 / labels.length;
 
   // Aを12時に置くため、開始角を「-90度」(上方向) にする
@@ -1120,10 +1153,73 @@ function buildTheoryWheel(containerId) {
     text.setAttribute("class", "wheel-text");
     text.textContent = label;
     svg.appendChild(text);
+
+    // セグメントの内側中央点（線の起点・終点用）
+    const innerPoint = polarToCartesian(cx, cy, rInner + 4, mid);
+
+    // dataに保存
+    path.dataset.cx = innerPoint.x;
+    path.dataset.cy = innerPoint.y;
   });
 
   container.innerHTML = "";
   container.appendChild(svg);
+}
+
+function clearTheoryWheelChordShape() {
+  const g = document.querySelector("#theoryWheel #chordPoly");
+  if (g) g.innerHTML = "";
+}
+
+function drawTheoryWheelChordPolygon(noteNames) {
+  const svg = document.querySelector("#theoryWheel svg");
+  const group = svg?.querySelector("#chordPoly");
+  if (!group) return;
+
+  clearTheoryWheelChordShape();
+
+  // 構成音に該当するセグメント（＝座標持ち）を集める
+  const segs = Array.from(
+    document.querySelectorAll("#theoryWheel .wheel-seg"),
+  ).filter((seg) => noteNames.includes(seg.dataset.note));
+
+  // 2音以下は多角形にならない（線だけでOK）
+  if (segs.length < 3) return;
+
+  // viewBox から中心座標を取得（size=360前提でもいいけど、堅牢に）
+  const vb = svg.viewBox.baseVal;
+  const cx = vb.x + vb.width / 2;
+  const cy = vb.y + vb.height / 2;
+
+  // 座標を取り出し、中心に対する角度で並べ替え（交差防止）
+  const pts = segs
+    .map((seg) => {
+      const x = Number(seg.dataset.cx);
+      const y = Number(seg.dataset.cy);
+      const angle = Math.atan2(y - cy, x - cx);
+      return { x, y, angle };
+    })
+    .sort((a, b) => a.angle - b.angle);
+
+  // polygon の points 形式へ
+  const pointsAttr = pts.map((p) => `${p.x},${p.y}`).join(" ");
+
+  const poly = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "polygon",
+  );
+  poly.setAttribute("points", pointsAttr);
+
+  // 見た目（木テーマに合う薄い面＋縁）
+  poly.setAttribute("fill", "rgba(240,192,138,0.18)");
+  poly.setAttribute("stroke", "rgba(240,192,138,0.85)");
+  poly.setAttribute("stroke-width", "3");
+  poly.setAttribute("stroke-linejoin", "round");
+
+  // ちょい発光（任意）
+  poly.setAttribute("filter", "drop-shadow(0 0 6px rgba(240,192,138,0.35))");
+
+  group.appendChild(poly);
 }
 
 function normalizeLabelToSharp(label) {
@@ -1152,6 +1248,60 @@ function getScalePitchClasses(keyName, mode) {
   return intervals.map((iv) => (rootPc + iv) % 12);
 }
 
+// ドーナツ上のコード線をクリア
+function clearTheoryWheelLines() {
+  const g = document.querySelector("#theoryWheel #chordLines");
+  if (g) g.innerHTML = "";
+}
+
+// ドーナツ上にコード線を描画
+function drawTheoryWheelChordLines(noteNames) {
+  const svg = document.querySelector("#theoryWheel svg");
+  const group = svg?.querySelector("#chordLines");
+  if (!group) return;
+
+  clearTheoryWheelLines();
+
+  const segs = Array.from(
+    document.querySelectorAll("#theoryWheel .wheel-seg"),
+  ).filter((seg) => noteNames.includes(seg.dataset.note));
+
+  if (segs.length < 2) return;
+
+  // 全組み合わせで線を引く
+  for (let i = 0; i < segs.length; i++) {
+    for (let j = i + 1; j < segs.length; j++) {
+      const s1 = segs[i];
+      const s2 = segs[j];
+
+      const x1 = Number(s1.dataset.cx);
+      const y1 = Number(s1.dataset.cy);
+      const x2 = Number(s2.dataset.cx);
+      const y2 = Number(s2.dataset.cy);
+
+      const line = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "line",
+      );
+
+      line.setAttribute("x1", x1);
+      line.setAttribute("y1", y1);
+      line.setAttribute("x2", x2);
+      line.setAttribute("y2", y2);
+
+      line.setAttribute("stroke", "rgba(240,192,138,0.85)");
+      line.setAttribute("stroke-width", "3");
+      line.setAttribute("stroke-linecap", "round");
+
+      // ほんのり発光（任意）
+      line.setAttribute("filter", "drop-shadow(0 0 5px rgba(240,192,138,0.5))");
+
+      group.appendChild(line);
+    }
+  }
+}
+
+// スケール構成音ハイライト更新
 function updateTheoryWheelScaleHighlight() {
   const pcs = getScalePitchClasses(currentKeyName, scaleMode);
   const allowed = new Set(pcs.map((pc) => NOTE_NAMES_SHARP[pc]));
