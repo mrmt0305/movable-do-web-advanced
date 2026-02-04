@@ -1006,3 +1006,84 @@ body {
 .oct-zone:hover {
   background: rgba(255, 255, 255, 0.04);
 }
+
+/* =========================
+   Octave hint arrows (visual only)
+   ========================= */
+
+.piano {
+  position: relative;
+}
+
+/* 左矢印 */
+.piano::before,
+.piano::after {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 15;            /* 鍵盤より上に見せる */
+  pointer-events: none;   /* 重要：クリックを邪魔しない */
+  opacity: 0.55;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1;
+  padding: 10px 8px;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.18);         /* うっすら */
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: inherit; /* 文字色は全体に追従 */
+}
+
+/* 左 */
+.piano::before {
+  content: "◀︎";
+  left: 6px;
+}
+
+/* 右 */
+.piano::after {
+  content: "▶︎";
+  right: 6px;
+}
+
+/* ホバー時に少し強調（見た目だけ） */
+.piano:hover::before,
+.piano:hover::after {
+  opacity: 0.8;
+  filter: brightness(1.08);
+}
+
+/* =========================
+   Octave hover zones
+   ========================= */
+
+.oct-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 5%;
+  z-index: 20;
+  cursor: pointer;
+  user-select: none;
+
+  /* 通常は完全透明 */
+  background: transparent;
+
+  /* 枠なし */
+  border: none;
+
+  transition: background 0.12s ease;
+}
+
+.oct-zone-left { left: 0; }
+.oct-zone-right { right: 0; }
+
+/* ホバー時：ボタンと同系色（青系） */
+.oct-zone:hover {
+  background: rgba(37, 99, 235, 0.18); /* ← tbtn.active の青を薄く */
+}
+
+/* 押してる時は少し濃く */
+.oct-zone:active {
+  background: rgba(37, 99, 235, 0.28);
+}

@@ -779,24 +779,32 @@ function setupKeyboardControl() {
   });
 }
 
-// オクターブ変更ゾーンのセットアップ
-function setupOctaveZones() {
-  const left = document.getElementById("octZoneLeft");
-  const right = document.getElementById("octZoneRight");
+// ピアノ端クリックでオクターブ変更
+function setupOctaveEdgeClick() {
+  const piano = document.querySelector(".piano");
+  if (!piano) return;
 
-  if (left) {
-    left.addEventListener("pointerdown", (e) => {
+  piano.addEventListener("pointerdown", (e) => {
+    // クリック位置を .piano 内の割合で判定
+    const rect = piano.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const ratio = x / rect.width;
+
+    // 左右5%のみ反応
+    if (ratio <= 0.05) {
+      // 端クリックは鍵盤の「発音」までいかないようにしたいなら preventDefault
       e.preventDefault();
       changeOctave(-1);
-    });
-  }
-
-  if (right) {
-    right.addEventListener("pointerdown", (e) => {
+      return;
+    }
+    if (ratio >= 0.95) {
       e.preventDefault();
       changeOctave(+1);
-    });
-  }
+      return;
+    }
+
+    // 中央は何もしない（鍵盤ボタン側が通常通り処理）
+  }, { passive: false });
 }
 
 // 移調ボタンのセットアップ
@@ -1094,7 +1102,7 @@ window.addEventListener("DOMContentLoaded", () => {
   setupTransposeButtons();
   setupChordButtons();
   setupSeventhChordButtons();
-  setupOctaveZones();
+  setupOctaveEdgeClick();
   updateOctaveLabel();
   setupScaleModeButtons();
   setupInstrumentButtons();
