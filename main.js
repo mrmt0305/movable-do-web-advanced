@@ -472,6 +472,7 @@ function applyKeyAndMode() {
   updateRefPianoOctaveNumbersOnly();
   updateTheoryWheelScaleHighlight();
   clearReferenceHold();
+  drawTheoryWheelRootStars();
 }
 
 /* =========================
@@ -1123,6 +1124,11 @@ function buildTheoryWheel(containerId) {
   centerText.textContent = ""; // 初期は空
   centerGroup.appendChild(centerText);
 
+  // === ルートマーク用グループ ===
+  const rootMarkGroup = document.createElementNS(svgNS, "g");
+  rootMarkGroup.setAttribute("id", "rootMarks");
+  svg.appendChild(rootMarkGroup);
+
   const segAngle = 360 / labels.length;
 
   // Aを12時に置くため、開始角を「-90度」(上方向) にする
@@ -1160,6 +1166,7 @@ function buildTheoryWheel(containerId) {
     // dataに保存
     path.dataset.cx = innerPoint.x;
     path.dataset.cy = innerPoint.y;
+    path.dataset.angle = mid; // 中心角も保存（★配置用）
   });
 
   container.innerHTML = "";
@@ -1220,6 +1227,69 @@ function drawTheoryWheelChordPolygon(noteNames) {
   poly.setAttribute("filter", "drop-shadow(0 0 6px rgba(240,192,138,0.35))");
 
   group.appendChild(poly);
+}
+
+function clearTheoryWheelRootMarks() {
+  const g = document.querySelector("#theoryWheel #rootMarks");
+  if (g) g.innerHTML = "";
+}
+
+function drawTheoryWheelRootStars() {
+  const svg = document.querySelector("#theoryWheel svg");
+  if (!svg) return;
+
+  const group = svg.querySelector("#rootMarks");
+  if (!group) return;
+
+  clearTheoryWheelRootMarks();
+
+  // viewBox から中心
+  const vb = svg.viewBox.baseVal;
+  const cx = vb.x + vb.width / 2;
+  const cy = vb.y + vb.height / 2;
+
+  // 外側円より少し外に出す
+  const rStar = 175; // rOuter=160なのでちょい外
+
+  // 現在キー（#統一）
+  const majorRoot = normalizeLabelToSharp(currentKeyName);
+
+  // 相対マイナー：メジャーから -3 半音
+  const majorPc = NOTE_NAMES_SHARP.indexOf(majorRoot);
+  const minorPc = (majorPc + 9) % 12; // -3 mod12
+  const minorRoot = NOTE_NAMES_SHARP[minorPc];
+
+  document.querySelectorAll("#theoryWheel .wheel-seg").forEach(seg => {
+    const note = seg.dataset.note;
+
+    let color = null;
+
+    if (note === majorRoot) {
+      color = "#f59e0b"; // オレンジ
+    }
+    if (note === minorRoot) {
+      color = "#38bdf8"; // 水色
+    }
+
+    if (!color) return;
+
+    const angle = Number(seg.dataset.angle);
+
+    const p = polarToCartesian(cx, cy, rStar, angle);
+
+    const star = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "text"
+    );
+
+    star.setAttribute("x", p.x);
+    star.setAttribute("y", p.y);
+    star.textContent = "★";
+    star.setAttribute("class", "wheel-root-star");
+    star.setAttribute("fill", color);
+
+    group.appendChild(star);
+  });
 }
 
 function normalizeLabelToSharp(label) {
@@ -1325,4 +1395,5 @@ function updateTheoryWheelScaleHighlight() {
 window.addEventListener("DOMContentLoaded", () => {
   buildTheoryWheel("theoryWheel");
   updateTheoryWheelScaleHighlight();
+  drawTheoryWheelRootStars();
 });

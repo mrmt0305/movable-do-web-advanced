@@ -943,3 +943,13 @@ footer a {
   /* 縁取りは消す（目立つ原因） */
   stroke: none;
 }
+
+/* ルート音マーク */
+.wheel-root-star{
+  font-size: 15px;
+  font-weight: 900;
+  dominant-baseline: middle;
+  text-anchor: middle;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px rgba(0,0,0,0.6));
+}
