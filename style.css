@@ -558,6 +558,9 @@ button.key {
   font-weight: 700;
   opacity: 0.9;
   margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 /* instrument */
@@ -727,13 +730,6 @@ button.key {
 }
 .repeat-btn:active {
   transform: translateY(1px) scale(0.99);
-}
-
-/* hint */
-.tempo-hint {
-  margin-top: 8px;
-  font-size: 0.75rem;
-  opacity: 0.6;
 }
 
 /* note chips */
@@ -1043,12 +1039,10 @@ footer a {
 
 /* ピル型ボタン */
 .scale-btn {
-  display: grid;
   grid-template-columns: 22px 1fr auto;
   align-items: center;
   gap: 8px;
 
-  width: 100%;
   padding: 10px 10px;
   border-radius: 999px;
 
@@ -1168,4 +1162,86 @@ footer a {
 
 .ethnic-tooltip {
   max-width: min(280px, calc(100vw - 20px));
+}
+
+/* =========================
+   Ethnic filter chips
+   ========================= */
+
+.scale-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 6px;
+}
+
+.filter-btn {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.01em;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease,
+    transform 0.08s ease;
+}
+
+.filter-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.filter-btn:active {
+  transform: translateY(1px);
+}
+
+.filter-btn.is-active {
+  background: rgba(240, 192, 138, 0.18);
+  border-color: rgba(240, 192, 138, 0.55);
+  box-shadow: 0 0 0 2px rgba(240, 192, 138, 0.15) inset;
+}
+
+/* =========================
+   Ethnic title + reset button
+   ========================= */
+
+.scale-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.scale-title-text {
+  font-weight: 900;
+  font-size: 16px;
+  letter-spacing: 0.02em;
+}
+
+/* 解除ボタンは少しコンパクトに */
+.scale-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  width: auto;
+  padding: 6px 10px;
+}
+
+.scale-reset-btn .label {
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.scale-reset-btn .tag {
+  font-size: 10px;
+  padding: 2px 6px;
 }

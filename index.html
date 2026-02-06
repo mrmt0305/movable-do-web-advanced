@@ -66,9 +66,6 @@
                         </button>
                     </div>
                 </div>
-
-                <div class="tempo-hint">※BPM表示をドラッグするとテンポ変更</div>
-
                 <div class="last-chord-row">
                     <span class="last-chord-label" id="lastChordLabel">（未選択）</span>
                 </div>
@@ -82,86 +79,95 @@
                 <div class="ethnic-panel" aria-label="民族スケール">
                     <div class="panel-title">
                         民族スケール
+                        <!-- 解除ボタン（常に表示） -->
+                        <button class="scale-btn scale-reset-btn" type="button" data-scale="none" data-cat="always">
+                            <span class="label">通常</span>
+                        </button>
                     </div>
 
-                    <!-- 解除 -->
-                    <button class="scale-btn" type="button" data-scale="none" style="margin-left:8px;">
+                    <div class="scale-filter" id="scaleFilter">
+                        <button type="button" class="filter-btn is-active" data-cat="all">すべて</button>
+                        <button type="button" class="filter-btn" data-cat="japan">和風</button>
+                        <button type="button" class="filter-btn" data-cat="world">世界</button>
+                        <button type="button" class="filter-btn" data-cat="modern">現代</button>
+                        <button type="button" class="filter-btn" data-cat="play">遊び</button>
+                    </div>
 
-                        <!-- 和風 -->
-                        <button class="scale-btn" type="button" data-scale="yonanuki-major">
-                            <span class="emoji">🌸</span><span class="label">ヨナ抜き</span>
-                            <span class="tag">和メジャー</span>
-                        </button>
+                    <!-- 和風 -->
+                    <button class="scale-btn" type="button" data-scale="yonanuki-major" data-cat="japan">
+                        <span class="emoji">🌸</span><span class="label">ヨナ抜き</span>
+                        <span class="tag">和メジャー</span>
+                    </button>
 
-                        <button class="scale-btn" type="button" data-scale="in-scale">
-                            <span class="emoji">🌙</span><span class="label">陰音階</span>
-                            <span class="tag">和マイナー</span>
-                        </button>
+                    <button class="scale-btn" type="button" data-scale="in-scale" data-cat="japan">
+                        <span class="emoji">🌙</span><span class="label">陰音階</span>
+                        <span class="tag">和マイナー</span>
+                    </button>
 
-                        <!-- 都節 -->
-                        <button class="scale-btn" type="button" data-scale="miyako-bushi">
-                            <span class="emoji">🎎</span><span class="label">都節</span>
-                            <span class="tag">哀愁</span>
-                        </button>
+                    <!-- 都節 -->
+                    <button class="scale-btn" type="button" data-scale="miyako-bushi" data-cat="japan">
+                        <span class="emoji">🎎</span><span class="label">都節</span>
+                        <span class="tag">哀愁</span>
+                    </button>
 
-                        <!-- 琉球 -->
-                        <button class="scale-btn" type="button" data-scale="ryukyu">
-                            <span class="emoji">🗻</span><span class="label">琉球</span>
-                            <span class="tag">南国</span>
-                        </button>
+                    <!-- 琉球 -->
+                    <button class="scale-btn" type="button" data-scale="ryukyu" data-cat="japan">
+                        <span class="emoji">🗻</span><span class="label">琉球</span>
+                        <span class="tag">南国</span>
+                    </button>
 
-                        <!-- 世界 -->
-                        <button class="scale-btn" type="button" data-scale="india">
-                            <span class="emoji">🕉</span><span class="label">インド</span>
-                            <span class="tag">ラーガ</span>
-                        </button>
+                    <!-- 世界 -->
+                    <button class="scale-btn" type="button" data-scale="india" data-cat="world">
+                        <span class="emoji">🕉</span><span class="label">インド</span>
+                        <span class="tag">ラーガ</span>
+                    </button>
 
-                        <button class="scale-btn" type="button" data-scale="celtic">
-                            <span class="emoji">🍀</span><span class="label">ケルト</span>
-                            <span class="tag">牧歌</span>
-                        </button>
+                    <button class="scale-btn" type="button" data-scale="celtic" data-cat="world">
+                        <span class="emoji">🍀</span><span class="label">ケルト</span>
+                        <span class="tag">牧歌</span>
+                    </button>
 
-                        <button class="scale-btn" type="button" data-scale="middle-east">
-                            <span class="emoji">🕌</span><span class="label">中東</span>
-                            <span class="tag">砂漠</span>
-                        </button>
+                    <button class="scale-btn" type="button" data-scale="middle-east" data-cat="world">
+                        <span class="emoji">🕌</span><span class="label">中東</span>
+                        <span class="tag">砂漠</span>
+                    </button>
 
-                        <button class="scale-btn" type="button" data-scale="africa">
-                            <span class="emoji">🪘</span><span class="label">アフリカ</span>
-                            <span class="tag">リズム</span>
-                        </button>
+                    <button class="scale-btn" type="button" data-scale="africa" data-cat="world">
+                        <span class="emoji">🪘</span><span class="label">アフリカ</span>
+                        <span class="tag">リズム</span>
+                    </button>
 
-                        <!-- 現代 -->
-                        <button class="scale-btn" type="button" data-scale="penta">
-                            <span class="emoji">🎵</span><span class="label">ペンタ</span>
-                            <span class="tag">万能</span>
-                        </button>
+                    <!-- 現代 -->
+                    <button class="scale-btn" type="button" data-scale="penta" data-cat="modern">
+                        <span class="emoji">🎵</span><span class="label">ペンタ</span>
+                        <span class="tag">万能</span>
+                    </button>
 
-                        <button class="scale-btn" type="button" data-scale="blues">
-                            <span class="emoji">🎸</span><span class="label">ブルース</span>
-                            <span class="tag">渋い</span>
-                        </button>
+                    <button class="scale-btn" type="button" data-scale="blues" data-cat="modern">
+                        <span class="emoji">🎸</span><span class="label">ブルース</span>
+                        <span class="tag">渋い</span>
+                    </button>
 
-                        <button class="scale-btn" type="button" data-scale="whole-tone">
-                            <span class="emoji">🌈</span><span class="label">全音</span>
-                            <span class="tag">浮遊</span>
-                        </button>
+                    <button class="scale-btn" type="button" data-scale="whole-tone" data-cat="modern">
+                        <span class="emoji">🌈</span><span class="label">全音</span>
+                        <span class="tag">浮遊</span>
+                    </button>
 
-                        <button class="scale-btn" type="button" data-scale="diminished">
-                            <span class="emoji">😈</span><span class="label">ディミ</span>
-                            <span class="tag">緊張</span>
-                        </button>
+                    <button class="scale-btn" type="button" data-scale="diminished" data-cat="modern">
+                        <span class="emoji">😈</span><span class="label">ディミ</span>
+                        <span class="tag">緊張</span>
+                    </button>
 
-                        <!-- 遊び -->
-                        <button class="scale-btn" type="button" data-scale="random">
-                            <span class="emoji">🎰</span><span class="label">ランダム</span>
-                            <span class="tag">運試し</span>
-                        </button>
+                    <!-- 遊び -->
+                    <button class="scale-btn" type="button" data-scale="random" data-cat="play">
+                        <span class="emoji">🎰</span><span class="label">ランダム</span>
+                        <span class="tag">運試し</span>
+                    </button>
 
-                        <button class="scale-btn" type="button" data-scale="experiment">
-                            <span class="emoji">🧪</span><span class="label">実験</span>
-                            <span class="tag">変化</span>
-                        </button>
+                    <button class="scale-btn" type="button" data-scale="experiment" data-cat="play">
+                        <span class="emoji">🧪</span><span class="label">実験</span>
+                        <span class="tag">変化</span>
+                    </button>
 
 
                 </div>

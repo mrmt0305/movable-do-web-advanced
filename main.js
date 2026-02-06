@@ -1766,6 +1766,43 @@ function setupEthnicScaleControls() {
   const buttons = panel.querySelectorAll(".scale-btn");
   if (!buttons.length) return;
 
+  const filterBar = document.getElementById("scaleFilter");
+  const filterBtns = filterBar ? filterBar.querySelectorAll(".filter-btn") : [];
+
+  function applyCategoryFilter(cat) {
+    buttons.forEach((b) => {
+      const bCat = b.dataset.cat || "all";
+
+      // always(解除) は常に表示
+      const shouldShow = cat === "all" || bCat === "always" || bCat === cat;
+
+      // 表示切替（grid item を崩さない）
+      b.style.display = shouldShow ? "" : "none";
+    });
+  }
+
+  function setActiveFilterUI(target) {
+    filterBtns.forEach((b) => b.classList.remove("is-active"));
+    target.classList.add("is-active");
+  }
+
+  if (filterBtns.length) {
+    filterBtns.forEach((fb) => {
+      fb.addEventListener("click", (e) => {
+        e.preventDefault();
+        const cat = fb.dataset.cat || "all";
+        setActiveFilterUI(fb);
+        applyCategoryFilter(cat);
+
+        // ツールチップが残ってると邪魔なので消す
+        hideEthnicTooltip();
+      });
+    });
+
+    // 初期：すべて
+    applyCategoryFilter("all");
+  }
+
   function setActiveUI(targetBtn) {
     buttons.forEach((b) => b.classList.remove("is-active"));
     targetBtn.classList.add("is-active");
