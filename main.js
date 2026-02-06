@@ -347,8 +347,6 @@ function buildChordData(degreeIndex, kind) {
     const noteNames = baseMidis.map((m) =>
       getNoteNameFromMidi(m, transposeSemis, currentKeyName),
     );
-    drawTheoryWheelChordLines(noteNames);
-    drawTheoryWheelChordPolygon(noteNames);
     const actualMidis = baseMidis.map(toActualMidi);
 
     return { label, noteNames, baseMidis, actualMidis };
@@ -593,6 +591,11 @@ function playChord(kind, degreeIndex) {
 
   updateLastChordPanel(data.label, data.noteNames);
   setTheoryWheelCenterChordLabel(data.label);
+
+  const wheelNotes = data.noteNames.map(normalizeLabelToSharp);
+  drawTheoryWheelChordLines(wheelNotes);
+  drawTheoryWheelChordPolygon(wheelNotes);
+
   lastChordActualMidis = data.actualMidis.slice();
 
   const arpBtn = document.getElementById("arpPlayBtn");
