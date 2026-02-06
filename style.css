@@ -989,60 +989,60 @@ footer a {
    Ethnic Scale Panel (left-bottom)
    ========================= */
 
-.ethnic-panel{
+.ethnic-panel {
   width: 100%;
   border-radius: 10px;
   padding: 12px;
   box-sizing: border-box;
-  background: rgba(0,0,0,0.12);
-  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.ethnic-panel .panel-title{
+.ethnic-panel .panel-title {
   font-weight: 900;
-  letter-spacing: .02em;
+  letter-spacing: 0.02em;
   font-size: 16px;
 }
 
-.ethnic-panel .panel-sub{
+.ethnic-panel .panel-sub {
   margin: 6px 0 12px;
   font-size: 12px;
-  opacity: .75;
+  opacity: 0.75;
   line-height: 1.4;
 }
 
-.scale-section{
+.scale-section {
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px solid rgba(255,255,255,0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.section-head{
+.section-head {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 8px;
 }
 
-.section-icon{
+.section-icon {
   font-size: 16px;
   line-height: 1;
 }
 
-.section-title{
+.section-title {
   font-weight: 800;
   font-size: 13px;
-  opacity: .9;
+  opacity: 0.9;
 }
 
-.scale-grid{
+.scale-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
 
 /* ピル型ボタン */
-.scale-btn{
+.scale-btn {
   display: grid;
   grid-template-columns: 22px 1fr auto;
   align-items: center;
@@ -1052,63 +1052,67 @@ footer a {
   padding: 10px 10px;
   border-radius: 999px;
 
-  border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
   color: inherit;
 
   cursor: pointer;
   user-select: none;
 
-  transition: transform .08s ease, background .12s ease, border-color .12s ease, box-shadow .12s ease;
+  transition:
+    transform 0.08s ease,
+    background 0.12s ease,
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
 }
 
-.scale-btn .emoji{
+.scale-btn .emoji {
   font-size: 16px;
   line-height: 1;
 }
 
-.scale-btn .label{
+.scale-btn .label {
   font-weight: 800;
   font-size: 13px;
-  letter-spacing: .01em;
+  letter-spacing: 0.01em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.scale-btn .tag{
+.scale-btn .tag {
   font-size: 11px;
   font-weight: 700;
   padding: 3px 8px;
   border-radius: 999px;
-  background: rgba(0,0,0,0.18);
-  border: 1px solid rgba(255,255,255,0.10);
-  opacity: .95;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  opacity: 0.95;
 }
 
-.scale-btn:hover{
-  background: rgba(255,255,255,0.10);
-  border-color: rgba(255,255,255,0.22);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.20);
+.scale-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
 }
 
-.scale-btn:active{
+.scale-btn:active {
   transform: translateY(1px);
 }
 
 /* いずれ「選択中」にする用（UIだけ先に用意） */
-.scale-btn.is-active{
-  background: rgba(240,192,138,0.18);
-  border-color: rgba(240,192,138,0.55);
-  box-shadow: 0 0 0 2px rgba(240,192,138,0.15) inset;
+.scale-btn.is-active {
+  background: rgba(240, 192, 138, 0.18);
+  border-color: rgba(240, 192, 138, 0.55);
+  box-shadow: 0 0 0 2px rgba(240, 192, 138, 0.15) inset;
 }
 
-.scale-btn.is-active .tag{
-  background: rgba(240,192,138,0.16);
-  border-color: rgba(240,192,138,0.30);
+.scale-btn.is-active .tag {
+  background: rgba(240, 192, 138, 0.16);
+  border-color: rgba(240, 192, 138, 0.3);
 }
 
-.ethnic-tooltip{
+.ethnic-tooltip {
   position: fixed;
   z-index: 9999;
   pointer-events: none;
@@ -1116,46 +1120,52 @@ footer a {
   padding: 10px 12px;
   border-radius: 10px;
   background: rgba(10, 10, 10, 0.88);
-  border: 1px solid rgba(255,255,255,0.18);
-  color: rgba(255,255,255,0.92);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.92);
   font-size: 12px;
   line-height: 1.45;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
   opacity: 0;
   transform: translateY(6px);
-  transition: opacity .12s ease, transform .12s ease;
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease;
 }
 
-.ethnic-tooltip.is-show{
+.ethnic-tooltip.is-show {
   opacity: 1;
   transform: translateY(0);
 }
 
-.ethnic-tooltip .tt-title{
+.ethnic-tooltip .tt-title {
   font-weight: 800;
   font-size: 13px;
   margin-bottom: 6px;
 }
 
-.ethnic-tooltip .tt-row{
+.ethnic-tooltip .tt-row {
   margin-top: 4px;
   opacity: 0.92;
 }
 
-.ethnic-tooltip .tt-muted{
+.ethnic-tooltip .tt-muted {
   opacity: 0.75;
 }
 
-.key.is-disabled{
-  opacity: 0.22;              /* 透明度アップ */
-  pointer-events: none;       /* マウスで押せない */
+.key.is-disabled {
+  opacity: 0.22; /* 透明度アップ */
+  pointer-events: none; /* マウスで押せない */
   filter: grayscale(0.2);
 }
 
-.wheel-seg.is-disabled{
+.wheel-seg.is-disabled {
   opacity: 0.35;
 }
 
-.wheel-text.is-disabled{
+.wheel-text.is-disabled {
   opacity: 0.35;
+}
+
+.ethnic-tooltip {
+  max-width: min(280px, calc(100vw - 20px));
 }

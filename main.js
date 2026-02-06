@@ -181,56 +181,152 @@ const NOTE_NAMES_FLAT = [
 // intervals: ルートからの半音オフセット（1オクターブ内）
 // =========================
 
+// =========================
+// Ethnic scales (behavior-ready)
+// intervals: ルートからの半音オフセット（1オクターブ内）
+// =========================
+
 const ETHNIC_SCALES = {
-  // 和風
-  yo: {
-    name: "🇯🇵 ヨナ抜き（Yo）",
+  // --- 和風 ---
+  "yonanuki-major": {
+    name: "🌸 ヨナ抜き（和メジャー / Yo）",
     intervals: [0, 2, 4, 7, 9], // 1 2 3 5 6
-    hint: "4(ﾌｧ)と7(ｼ)が抜ける：明るい和風/民謡っぽい",
+    hint: "ﾌｧ(4)とｼ(7)が抜ける：明るい和風 / 民謡っぽい",
+    tendency: "メジャー寄り",
+    character: "明るく素朴・日本的で親しみやすい",
+    majorFeel: "民謡や和風ポップのような明るさ",
+    minorFeel: "ロックやブルース寄りで力強い響き",
   },
-  in: {
-    name: "🇯🇵 陰音階（In）",
+
+  "in-scale": {
+    name: "🌙 陰音階（In）",
     intervals: [0, 1, 5, 7, 8], // 1 ♭2 4 5 ♭6
-    hint: "2(ﾚ)と6(ﾗ)が効きにくい：哀愁/演歌っぽい",
-  },
-  hirajoshi: {
-    name: "🇯🇵 平調子（Hirajoshi）",
-    intervals: [0, 2, 3, 7, 8], // 1 2 ♭3 5 ♭6
-    hint: "4(ﾌｧ)と7(ｼ)が抜ける：渋い和風（箏っぽい）",
-  },
-  iwato: {
-    name: "🇯🇵 岩戸（Iwato）",
-    intervals: [0, 1, 5, 6, 10], // 1 ♭2 4 ♭5 ♭7
-    hint: "不穏/儀式感：5度が濁る（♭5入り）",
+    hint: "独特の哀愁：♭2 と ♭6 が効く（演歌・邦楽感）",
+    tendency: "マイナー寄り",
+    character: "哀愁・演歌的・切なさが強い",
+    majorFeel: "不思議で暗めの緊張感ある響き",
+    minorFeel: "強い哀愁と日本的情緒が出る",
   },
 
-  // インド系（例）
-  bhairav: {
-    name: "🇮🇳 バイラヴ（Bhairav）",
+  "miyako-bushi": {
+    name: "🎎 都節（Miyako-bushi）",
+    intervals: [0, 1, 5, 7, 8], // 1 ♭2 4 5 ♭6（陰音階と同系）
+    hint: "都節系：♭2 と ♭6 の哀愁。陰音階と近い（使い分けは雰囲気）",
+    tendency: "マイナー寄り",
+    character: "哀愁・静けさ・和風の情緒",
+    majorFeel: "神秘的で浮遊感のある響き",
+    minorFeel: "とても日本的で切ない雰囲気",
+  },
+
+  ryukyu: {
+    name: "🗻 琉球（Ryukyu）",
+    intervals: [0, 4, 5, 7, 11], // 1 3 4 5 7（代表例）
+    hint: "南国っぽい明るさ：3 と 7 が立つ（琉球音階の代表的な形）",
+    tendency: "メジャー寄り",
+    character: "明るく開放的・南国風",
+    majorFeel: "陽気で楽しい雰囲気になる",
+    minorFeel: "少し幻想的で不思議な明るさになる",
+  },
+
+  // --- 世界 ---
+  india: {
+    name: "🕉 インド（Bhairav系）",
     intervals: [0, 1, 4, 5, 7, 8, 11], // 1 ♭2 3 4 5 ♭6 7
-    hint: "♭2 と ♭6 が特徴：荘厳/緊張感",
+    hint: "♭2 と ♭6 が特徴：荘厳 / 緊張感（ラーガの入口）",
+    tendency: "どっちでもない",
+    character: "神秘的・緊張感・荘厳",
+    majorFeel: "異国感の強い不思議な響き",
+    minorFeel: "より緊張感と深みが増す",
   },
 
-  // ケルト/フォーク系（実用的にモード）
-  dorian: {
-    name: "☘️ ドリアン（Dorian）",
+  celtic: {
+    name: "🍀 ケルト（Dorian）",
     intervals: [0, 2, 3, 5, 7, 9, 10], // 1 2 ♭3 4 5 6 ♭7
     hint: "マイナー寄りで6が明るい：ケルト/フォーク定番",
-  },
-  mixolydian: {
-    name: "☘️ ミクソリディアン（Mixolydian）",
-    intervals: [0, 2, 4, 5, 7, 9, 10], // 1 2 3 4 5 6 ♭7
-    hint: "メジャーで♭7：陽気/ロック/フォーク感",
+    tendency: "マイナー寄り",
+    character: "哀愁の中に明るさ・牧歌的",
+    majorFeel: "少し切ない明るさになる",
+    minorFeel: "フォーク調の哀愁が強くなる",
   },
 
-  // 中東っぽい（有名どころ）
-  hijaz: {
-    name: "🕌 ヒジャーズ（Hijaz）",
+  "middle-east": {
+    name: "🕌 中東（Hijaz）",
     intervals: [0, 1, 4, 5, 7, 8, 10], // 1 ♭2 3 4 5 ♭6 ♭7
-    hint: "♭2→3の跳躍が独特：中東っぽい香り",
+    hint: "♭2→3 の跳躍が独特：中東っぽい香り",
+    tendency: "どっちでもない",
+    character: "エキゾチック・強烈な個性",
+    majorFeel: "中東音楽らしい独特の響き",
+    minorFeel: "さらに妖しさと緊張感が増す",
   },
 
-  // 「無効（通常）」に戻す用
+  africa: {
+    name: "🪘 アフリカ（Pentatonic / 民族系）",
+    intervals: [0, 2, 4, 7, 9], // メジャーペンタ（汎用）
+    hint: "反復リズムと相性◎：シンプルな5音（打楽器と混ぜやすい）",
+    tendency: "メジャー寄り",
+    character: "シンプル・リズミカル・原始的",
+    majorFeel: "明るくノリの良い響き",
+    minorFeel: "土臭く力強い雰囲気になる",
+  },
+
+  // --- 現代 ---
+  penta: {
+    name: "🎵 ペンタ（Major Pentatonic）",
+    intervals: [0, 2, 4, 7, 9],
+    hint: "事故りにくい万能5音：ポップス/民族/アンビエント全部いける",
+    tendency: "メジャー寄り",
+    character: "安定・万能・きれい",
+    majorFeel: "明るくポップで使いやすい",
+    minorFeel: "ロックやブルースに合う響き",
+  },
+
+  blues: {
+    name: "🎸 ブルース（Blues Scale）",
+    intervals: [0, 3, 5, 6, 7, 10], // 1 ♭3 4 ♭5 5 ♭7
+    hint: "ブルーノート(♭5)が渋い：泣き・泥臭さ・ロック感",
+    tendency: "どっちでもない",
+    character: "渋い・感情的・泥臭い",
+    majorFeel: "明るさの中に渋さが出る",
+    minorFeel: "泣きの表現が強くなる",
+  },
+
+  "whole-tone": {
+    name: "🌈 全音（Whole Tone）",
+    intervals: [0, 2, 4, 6, 8, 10], // 全部全音
+    hint: "浮遊感MAX：半音が無いので解決しない不思議な響き",
+    tendency: "どっちでもない",
+    character: "浮遊感・夢の中のような響き",
+    majorFeel: "ふわふわして不安定になる",
+    minorFeel: "さらに幻想的になる",
+  },
+
+  diminished: {
+    name: "😈 ディミ（Diminished / Octatonic）",
+    // 代表例：Whole-Half（全→半の繰り返し）
+    intervals: [0, 2, 3, 5, 6, 8, 9, 11],
+    hint: "緊張/不穏：対称的で転調っぽく動く（ジャズ/映画音楽）",
+    tendency: "どっちでもない",
+    character: "緊張・不安・不穏",
+    majorFeel: "不思議な緊張感が生まれる",
+    minorFeel: "より暗く不安定になる",
+  },
+
+  // --- 遊び ---
+  random: {
+    name: "🎰 ランダム（Random 5 notes）",
+    // special: runtimeで差し替える
+    intervals: "RANDOM5",
+    hint: "毎回違う5音を生成（キーに対してランダムに許可音を作る）",
+    tendency: "どっちでもない",
+  },
+
+  experiment: {
+    name: "🧪 実験（Weird 6 notes）",
+    intervals: "WEIRD6",
+    hint: "ちょい不協和になりやすい6音を生成（遊び用）",
+  },
+
+  // --- 無効（通常） ---
   none: {
     name: "⏹ 通常（今のメジャー/マイナー）",
     intervals: null,
@@ -640,12 +736,11 @@ function playActualMidi(actualMidi) {
 function playNote(baseMidi) {
   const actualMidi = toActualMidi(baseMidi);
 
-  // 民族スケールで禁止音なら鳴らさない
+  // 民族スケールで禁止音なら鳴らさない（先に判定）
   if (!isAllowedActualMidi(actualMidi)) return;
 
   playActualMidi(actualMidi);
 
-  // 画面上の鍵盤（baseMidi）を一瞬光らせる
   const keyEl = document.querySelector(`.key[data-midi="${baseMidi}"]`);
   if (keyEl) {
     keyEl.classList.add("active");
@@ -1041,7 +1136,6 @@ async function startApp() {
   setupDurationSlider();
   setupArpButton();
   setupTempoControl();
-  setupEthnicScaleUIOnly();
   updateRefPianoOctaveNumbersOnly();
   setupEthnicScaleControls();
 
@@ -1062,23 +1156,6 @@ window.addEventListener("DOMContentLoaded", () => {
  * ethnic scale
  * ========================= */
 
-function setupEthnicScaleUIOnly() {
-  const panel = document.querySelector(".ethnic-panel");
-  if (!panel) return;
-
-  const buttons = panel.querySelectorAll(".scale-btn");
-
-  buttons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      // 同パネル内のactiveを全解除
-      buttons.forEach((b) => b.classList.remove("is-active"));
-
-      // 押したボタンだけactive
-      btn.classList.add("is-active");
-    });
-  });
-}
-
 function ensureEthnicTooltip() {
   let el = document.getElementById("ethnicTooltip");
   if (el) return el;
@@ -1095,7 +1172,7 @@ function setEthnicTooltipContent(scaleId) {
   const def = ETHNIC_SCALES[scaleId];
   if (!def) return;
 
-  const { allowedNames, removedNames } = getAllowedAndRemovedNoteNames();
+  const { allowedNames, removedNames } = getAllowedAndRemovedNoteNames(scaleId);
 
   tt.innerHTML = `
     <div class="tt-title">${def.name}</div>
@@ -1103,15 +1180,51 @@ function setEthnicTooltipContent(scaleId) {
     <div class="tt-row tt-muted">今のキー：${currentKeyName} / ${scaleMode}</div>
     <div class="tt-row">使える音：${allowedNames.join(" , ")}</div>
     <div class="tt-row">使わない音：${removedNames.join(" , ")}</div>
+      <div>傾向：${def.tendency || "－"}</div>
+      <div>性格：${def.character || "－"}</div>
+      <div>メジャーでの雰囲気：${def.majorFeel || "－"}</div>
+      <div>マイナーでの雰囲気：${def.minorFeel || "－"}</div>
+    </div>
   `;
 }
 
 function showEthnicTooltipAt(x, y) {
   const tt = ensureEthnicTooltip();
-  const pad = 14;
-  tt.style.left = `${x + pad}px`;
-  tt.style.top = `${y + pad}px`;
+
+  const pad = 14; // カーソルからの距離
+  const margin = 10; // 画面端からの余白
+
+  // まず一旦表示状態にしてサイズを測れるようにする
   tt.classList.add("is-show");
+  tt.style.left = "0px";
+  tt.style.top = "0px";
+
+  // ここでDOM更新を確定させる（サイズ取得の安定化）
+  // ※ requestAnimationFrame でも良いが、ここは同期でOKなケースが多い
+  const rect = tt.getBoundingClientRect();
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  // 基本は右下
+  let left = x + pad;
+  let top = y + pad;
+
+  // 右にはみ出す → 左側へ
+  if (left + rect.width + margin > vw) {
+    left = x - pad - rect.width;
+  }
+
+  // 下にはみ出す → 上側へ
+  if (top + rect.height + margin > vh) {
+    top = y - pad - rect.height;
+  }
+
+  // それでもはみ出す場合に備えて、画面内へクランプ
+  left = Math.max(margin, Math.min(left, vw - rect.width - margin));
+  top = Math.max(margin, Math.min(top, vh - rect.height - margin));
+
+  tt.style.left = `${left}px`;
+  tt.style.top = `${top}px`;
 }
 
 function hideEthnicTooltip() {
@@ -1120,25 +1233,73 @@ function hideEthnicTooltip() {
   tt.classList.remove("is-show");
 }
 
-function getRestrictionPitchClasses() {
-  // 民族スケールが未選択 or none なら制限なし
-  if (!currentEthnicScaleId || currentEthnicScaleId === "none") return null;
+function getAllowedPcsForScaleId(scaleId) {
+  // none は通常スケール（メジャー/マイナー）
+  if (!scaleId || scaleId === "none") {
+    return getScalePitchClasses(currentKeyName, scaleMode);
+  }
 
-  const def = ETHNIC_SCALES[currentEthnicScaleId];
-  if (!def || !Array.isArray(def.intervals)) return null;
+  const def = ETHNIC_SCALES[scaleId];
+  if (!def) return getScalePitchClasses(currentKeyName, scaleMode);
 
   const rootSharp = normalizeLabelToSharp(currentKeyName);
   const rootPc = NOTE_NAMES_SHARP.indexOf(rootSharp);
-  if (rootPc < 0) return null;
+  if (rootPc < 0) return [];
 
+  if (def.intervals === "RANDOM5" || def.intervals === "WEIRD6") {
+    return buildRandomAllowedPcs(rootPc, def.intervals) || [];
+  }
+
+  if (!Array.isArray(def.intervals)) return [];
   return def.intervals.map((iv) => (rootPc + iv) % 12);
 }
 
-function getAllowedAndRemovedNoteNames() {
-  const allowedPcs = getRestrictionPitchClasses();
+function getRestrictionPitchClasses() {
+  // none の時は制限なし（= null）
+  if (!currentEthnicScaleId || currentEthnicScaleId === "none") return null;
+
+  // ethnic を優先した “許可 pitch class” を返す
+  const pcs = getAllowedPcsForScaleId(currentEthnicScaleId);
+  return pcs && pcs.length ? pcs : null;
+}
+
+function uniqueSample(arr, k) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a.slice(0, k);
+}
+
+function buildRandomAllowedPcs(rootPc, modeKey) {
+  // 12音から選ぶ（rootは必ず含める）
+  const all = [...Array(12)].map((_, i) => i);
+  const rest = all.filter((pc) => pc !== rootPc);
+
+  if (modeKey === "RANDOM5") {
+    const picked = uniqueSample(rest, 4);
+    return [rootPc, ...picked].sort((a, b) => a - b);
+  }
+
+  if (modeKey === "WEIRD6") {
+    // 不協和寄りになりやすい候補を少し混ぜる（♭2, tritone, ♭6 など）
+    const spicy = [1, 6, 8, 10].map((iv) => (rootPc + iv) % 12);
+    const base = uniqueSample(rest, 5);
+
+    // root + (spicyから最低1個) + 残り
+    const oneSpicy = spicy[Math.floor(Math.random() * spicy.length)];
+    const merged = Array.from(new Set([rootPc, oneSpicy, ...base])).slice(0, 6);
+    return merged.sort((a, b) => a - b);
+  }
+
+  return null;
+}
+
+function getAllowedAndRemovedNoteNames(scaleId) {
+  const allowedPcs = getAllowedPcsForScaleId(scaleId);
   const allowedSet = new Set(allowedPcs);
 
-  // ドーナツ表記は # に寄せてる前提
   const allowedNames = allowedPcs.map((pc) => NOTE_NAMES_SHARP[pc]);
 
   const removedNames = NOTE_NAMES_SHARP.map((name, pc) => ({ name, pc }))
