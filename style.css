@@ -860,60 +860,60 @@ footer a {
    Theory Panel (right side)
    ========================= */
 
-.theory-panel{
+.theory-panel {
   width: 100%;
   border-radius: 10px;
   padding: 12px;
   box-sizing: border-box;
-  background: rgba(0,0,0,0.12);
-  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.theory-wheel{
+.theory-wheel {
   margin-top: 10px;
   width: 100%;
-  max-width: 320px;     /* 右パネル内での最大サイズ */
-  aspect-ratio: 1 / 1;  /* 正方形を維持 */
+  max-width: 320px; /* 右パネル内での最大サイズ */
+  aspect-ratio: 1 / 1; /* 正方形を維持 */
   margin-left: auto;
   margin-right: auto;
 }
 
-.theory-wheel svg{
+.theory-wheel svg {
   width: 100%;
   height: 100%;
   display: block;
 }
 
 /* ドーナツの各セグメント */
-.wheel-seg{
-  fill: rgba(0,0,0,0.22);
-  stroke: rgba(255,255,255,0.85);
+.wheel-seg {
+  fill: rgba(0, 0, 0, 0.22);
+  stroke: rgba(255, 255, 255, 0.85);
   stroke-width: 3;
 }
 
 /* 中抜きリング（外枠＆内枠っぽさを出す） */
-.wheel-ring{
+.wheel-ring {
   fill: none;
-  stroke: rgba(255,255,255,0.95);
+  stroke: rgba(255, 255, 255, 0.95);
   stroke-width: 6;
 }
 
 /* ドーナツの各セグメント */
-.wheel-seg{
+.wheel-seg {
   fill: url(#segBlack);
-  stroke: rgba(255,255,255,0.85);
+  stroke: rgba(255, 255, 255, 0.85);
   stroke-width: 3;
 }
 
-.wheel-seg.is-scale{
+.wheel-seg.is-scale {
   fill: url(#segWhite);
 }
 
 /* ===== スケール外（黒鍵側） ===== */
 .wheel-text {
-  fill: rgba(229, 231, 235, 0.55);   /* 少し薄く */
+  fill: rgba(229, 231, 235, 0.55); /* 少し薄く */
   font-weight: 600;
-  font-size: 16px;                 /* 小さめ */
+  font-size: 16px; /* 小さめ */
   letter-spacing: 0.02em;
   text-anchor: middle;
   dominant-baseline: middle;
@@ -922,16 +922,16 @@ footer a {
 
 /* ===== スケール内（白鍵側） ===== */
 .wheel-text.is-scale {
-  fill: #374151;                   /* はっきり */
+  fill: #374151; /* はっきり */
   font-weight: 900;
-  font-size: 20px;                 /* 大きめ */
+  font-size: 20px; /* 大きめ */
 }
 
 /* 中央のコード名（背景ウォーターマーク風） */
-.wheel-center-text{
-  fill: rgba(243, 231, 215, 0.18);   /* かなり薄く */
+.wheel-center-text {
+  fill: rgba(243, 231, 215, 0.18); /* かなり薄く */
   font-weight: 900;
-  font-size: 42px;                 /* 少し大きめで存在感は残す */
+  font-size: 42px; /* 少し大きめで存在感は残す */
   letter-spacing: 0.08em;
   dominant-baseline: middle;
   text-anchor: middle;
@@ -945,11 +945,217 @@ footer a {
 }
 
 /* ルート音マーク */
-.wheel-root-star{
+.wheel-root-star {
   font-size: 15px;
   font-weight: 900;
   dominant-baseline: middle;
   text-anchor: middle;
   pointer-events: none;
-  filter: drop-shadow(0 0 4px rgba(0,0,0,0.6));
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.6));
+}
+
+/* =========================
+   Ethnic Panel (left bottom)
+   ========================= */
+
+.side-panel.left {
+  display: flex;
+  flex-direction: column;
+}
+
+.ethnic-panel {
+  margin-top: auto; /* 左パネル内で下に寄せる */
+  width: 100%;
+  border-radius: 10px;
+  padding: 12px;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ethnic-panel .panel-title {
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  opacity: 0.9;
+}
+
+.ethnic-panel-body {
+  margin-top: 10px;
+  min-height: 80px;
+}
+
+/* =========================
+   Ethnic Scale Panel (left-bottom)
+   ========================= */
+
+.ethnic-panel{
+  width: 100%;
+  border-radius: 10px;
+  padding: 12px;
+  box-sizing: border-box;
+  background: rgba(0,0,0,0.12);
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+.ethnic-panel .panel-title{
+  font-weight: 900;
+  letter-spacing: .02em;
+  font-size: 16px;
+}
+
+.ethnic-panel .panel-sub{
+  margin: 6px 0 12px;
+  font-size: 12px;
+  opacity: .75;
+  line-height: 1.4;
+}
+
+.scale-section{
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.section-head{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.section-icon{
+  font-size: 16px;
+  line-height: 1;
+}
+
+.section-title{
+  font-weight: 800;
+  font-size: 13px;
+  opacity: .9;
+}
+
+.scale-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+/* ピル型ボタン */
+.scale-btn{
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  align-items: center;
+  gap: 8px;
+
+  width: 100%;
+  padding: 10px 10px;
+  border-radius: 999px;
+
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: inherit;
+
+  cursor: pointer;
+  user-select: none;
+
+  transition: transform .08s ease, background .12s ease, border-color .12s ease, box-shadow .12s ease;
+}
+
+.scale-btn .emoji{
+  font-size: 16px;
+  line-height: 1;
+}
+
+.scale-btn .label{
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: .01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.scale-btn .tag{
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.18);
+  border: 1px solid rgba(255,255,255,0.10);
+  opacity: .95;
+}
+
+.scale-btn:hover{
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.22);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.20);
+}
+
+.scale-btn:active{
+  transform: translateY(1px);
+}
+
+/* いずれ「選択中」にする用（UIだけ先に用意） */
+.scale-btn.is-active{
+  background: rgba(240,192,138,0.18);
+  border-color: rgba(240,192,138,0.55);
+  box-shadow: 0 0 0 2px rgba(240,192,138,0.15) inset;
+}
+
+.scale-btn.is-active .tag{
+  background: rgba(240,192,138,0.16);
+  border-color: rgba(240,192,138,0.30);
+}
+
+.ethnic-tooltip{
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  max-width: 280px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(10, 10, 10, 0.88);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.92);
+  font-size: 12px;
+  line-height: 1.45;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity .12s ease, transform .12s ease;
+}
+
+.ethnic-tooltip.is-show{
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ethnic-tooltip .tt-title{
+  font-weight: 800;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.ethnic-tooltip .tt-row{
+  margin-top: 4px;
+  opacity: 0.92;
+}
+
+.ethnic-tooltip .tt-muted{
+  opacity: 0.75;
+}
+
+.key.is-disabled{
+  opacity: 0.22;              /* 透明度アップ */
+  pointer-events: none;       /* マウスで押せない */
+  filter: grayscale(0.2);
+}
+
+.wheel-seg.is-disabled{
+  opacity: 0.35;
+}
+
+.wheel-text.is-disabled{
+  opacity: 0.35;
 }

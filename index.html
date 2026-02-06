@@ -77,11 +77,136 @@
                     <!-- JSで追加 -->
                 </div>
             </div>
-            <!-- 民族スケールパネル -->
-            <div class="sarp-panel">
-                <div class="panel-title">民族スケール</div>
-                <div> Comming Soon ... </div>
-            </div>
+            <!-- サイドパネル（左・下） -->
+            <aside class="side-panel left bottom">
+                <div class="ethnic-panel" aria-label="民族スケール">
+                    <div class="panel-title">
+                        民族スケール
+                        <!-- 解除（JSにある none を使う） -->
+                        <button class="scale-btn" type="button" data-scale="none" style="margin-left:8px;">
+                            <span class="emoji">⏹</span><span class="label">解除</span>
+                            <span class="tag">通常</span>
+                        </button>
+                    </div>
+
+                    <!-- 和風 -->
+                    <section class="scale-section" aria-label="和風">
+                        <div class="section-head">
+                            <span class="section-icon">🎌</span>
+                            <span class="section-title">和風</span>
+                        </div>
+                        <div class="scale-grid">
+                            <button class="scale-btn" type="button" data-scale="yo">
+                                <span class="emoji">🌸</span><span class="label">ヨナ抜き</span>
+                                <span class="tag">和メジャー</span>
+                            </button>
+
+                            <button class="scale-btn" type="button" data-scale="in">
+                                <span class="emoji">🌙</span><span class="label">陰音階</span>
+                                <span class="tag">和マイナー</span>
+                            </button>
+
+                            <!-- 都節に近い：JSでは hirajoshi -->
+                            <button class="scale-btn" type="button" data-scale="hirajoshi">
+                                <span class="emoji">🎎</span><span class="label">都節</span>
+                                <span class="tag">哀愁</span>
+                            </button>
+
+                            <!-- 琉球はJSに無いので一旦 none に退避（後で ryukyu をJSに追加したら戻す） -->
+                            <button class="scale-btn" type="button" data-scale="none">
+                                <span class="emoji">🗻</span><span class="label">琉球</span>
+                                <span class="tag">南国</span>
+                            </button>
+                        </div>
+                    </section>
+
+                    <!-- 世界 -->
+                    <section class="scale-section" aria-label="世界">
+                        <div class="section-head">
+                            <span class="section-icon">🌍</span>
+                            <span class="section-title">世界</span>
+                        </div>
+                        <div class="scale-grid">
+                            <!-- JSでは bhairav -->
+                            <button class="scale-btn" type="button" data-scale="bhairav">
+                                <span class="emoji">🕉</span><span class="label">インド</span>
+                                <span class="tag">ラーガ</span>
+                            </button>
+
+                            <!-- ケルト：dorian（または mixolydian にしてもOK） -->
+                            <button class="scale-btn" type="button" data-scale="dorian">
+                                <span class="emoji">🍀</span><span class="label">ケルト</span>
+                                <span class="tag">牧歌</span>
+                            </button>
+
+                            <!-- 中東：hijaz -->
+                            <button class="scale-btn" type="button" data-scale="hijaz">
+                                <span class="emoji">🕌</span><span class="label">中東</span>
+                                <span class="tag">砂漠</span>
+                            </button>
+
+                            <!-- アフリカはJSに無いので none に退避 -->
+                            <button class="scale-btn" type="button" data-scale="none">
+                                <span class="emoji">🪘</span><span class="label">アフリカ</span>
+                                <span class="tag">リズム</span>
+                            </button>
+                        </div>
+                    </section>
+
+                    <!-- 現代 -->
+                    <section class="scale-section" aria-label="現代">
+                        <div class="section-head">
+                            <span class="section-icon">🎧</span>
+                            <span class="section-title">現代</span>
+                        </div>
+                        <div class="scale-grid">
+                            <!-- penta / blues / whole-tone / diminished はJSに無いので none に退避 -->
+                            <button class="scale-btn" type="button" data-scale="none">
+                                <span class="emoji">🎵</span><span class="label">ペンタ</span>
+                                <span class="tag">万能</span>
+                            </button>
+
+                            <button class="scale-btn" type="button" data-scale="none">
+                                <span class="emoji">🎸</span><span class="label">ブルース</span>
+                                <span class="tag">渋い</span>
+                            </button>
+
+                            <button class="scale-btn" type="button" data-scale="none">
+                                <span class="emoji">🌈</span><span class="label">全音</span>
+                                <span class="tag">浮遊</span>
+                            </button>
+
+                            <button class="scale-btn" type="button" data-scale="none">
+                                <span class="emoji">😈</span><span class="label">ディミ</span>
+                                <span class="tag">緊張</span>
+                            </button>
+                        </div>
+                    </section>
+
+                    <!-- 遊び -->
+                    <section class="scale-section" aria-label="遊び">
+                        <div class="section-head">
+                            <span class="section-icon">🎲</span>
+                            <span class="section-title">遊び</span>
+                        </div>
+                        <div class="scale-grid">
+                            <!-- random / experiment もJSに無いので none に退避 -->
+                            <button class="scale-btn" type="button" data-scale="none">
+                                <span class="emoji">🎰</span><span class="label">ランダム</span>
+                                <span class="tag">運試し</span>
+                            </button>
+
+                            <button class="scale-btn" type="button" data-scale="none">
+                                <span class="emoji">🧪</span><span class="label">実験</span>
+                                <span class="tag">変化</span>
+                            </button>
+                        </div>
+                    </section>
+
+                </div>
+            </aside>
+
+
         </aside>
 
         <!-- メインコンテンツ -->

@@ -176,6 +176,70 @@ const NOTE_NAMES_FLAT = [
   "B",
 ];
 
+// =========================
+// Ethnic scales (UI-only -> behavior later)
+// intervals: ルートからの半音オフセット（1オクターブ内）
+// =========================
+
+const ETHNIC_SCALES = {
+  // 和風
+  yo: {
+    name: "🇯🇵 ヨナ抜き（Yo）",
+    intervals: [0, 2, 4, 7, 9], // 1 2 3 5 6
+    hint: "4(ﾌｧ)と7(ｼ)が抜ける：明るい和風/民謡っぽい",
+  },
+  in: {
+    name: "🇯🇵 陰音階（In）",
+    intervals: [0, 1, 5, 7, 8], // 1 ♭2 4 5 ♭6
+    hint: "2(ﾚ)と6(ﾗ)が効きにくい：哀愁/演歌っぽい",
+  },
+  hirajoshi: {
+    name: "🇯🇵 平調子（Hirajoshi）",
+    intervals: [0, 2, 3, 7, 8], // 1 2 ♭3 5 ♭6
+    hint: "4(ﾌｧ)と7(ｼ)が抜ける：渋い和風（箏っぽい）",
+  },
+  iwato: {
+    name: "🇯🇵 岩戸（Iwato）",
+    intervals: [0, 1, 5, 6, 10], // 1 ♭2 4 ♭5 ♭7
+    hint: "不穏/儀式感：5度が濁る（♭5入り）",
+  },
+
+  // インド系（例）
+  bhairav: {
+    name: "🇮🇳 バイラヴ（Bhairav）",
+    intervals: [0, 1, 4, 5, 7, 8, 11], // 1 ♭2 3 4 5 ♭6 7
+    hint: "♭2 と ♭6 が特徴：荘厳/緊張感",
+  },
+
+  // ケルト/フォーク系（実用的にモード）
+  dorian: {
+    name: "☘️ ドリアン（Dorian）",
+    intervals: [0, 2, 3, 5, 7, 9, 10], // 1 2 ♭3 4 5 6 ♭7
+    hint: "マイナー寄りで6が明るい：ケルト/フォーク定番",
+  },
+  mixolydian: {
+    name: "☘️ ミクソリディアン（Mixolydian）",
+    intervals: [0, 2, 4, 5, 7, 9, 10], // 1 2 3 4 5 6 ♭7
+    hint: "メジャーで♭7：陽気/ロック/フォーク感",
+  },
+
+  // 中東っぽい（有名どころ）
+  hijaz: {
+    name: "🕌 ヒジャーズ（Hijaz）",
+    intervals: [0, 1, 4, 5, 7, 8, 10], // 1 ♭2 3 4 5 ♭6 ♭7
+    hint: "♭2→3の跳躍が独特：中東っぽい香り",
+  },
+
+  // 「無効（通常）」に戻す用
+  none: {
+    name: "⏹ 通常（今のメジャー/マイナー）",
+    intervals: null,
+    hint: "民族スケールを解除して通常のスケールに戻す",
+  },
+};
+
+let currentEthnicScaleId = "none";
+
 /* =========================
  * UI Lock (Start gate)
  * ========================= */
@@ -575,6 +639,10 @@ function playActualMidi(actualMidi) {
 
 function playNote(baseMidi) {
   const actualMidi = toActualMidi(baseMidi);
+
+  // 民族スケールで禁止音なら鳴らさない
+  if (!isAllowedActualMidi(actualMidi)) return;
+
   playActualMidi(actualMidi);
 
   // 画面上の鍵盤（baseMidi）を一瞬光らせる
@@ -973,7 +1041,9 @@ async function startApp() {
   setupDurationSlider();
   setupArpButton();
   setupTempoControl();
+  setupEthnicScaleUIOnly();
   updateRefPianoOctaveNumbersOnly();
+  setupEthnicScaleControls();
 
   appStarted = true;
   unlockUI();
@@ -987,6 +1057,131 @@ window.addEventListener("DOMContentLoaded", () => {
   lockUI();
   setupStartCard();
 });
+
+/* =========================
+ * ethnic scale
+ * ========================= */
+
+function setupEthnicScaleUIOnly() {
+  const panel = document.querySelector(".ethnic-panel");
+  if (!panel) return;
+
+  const buttons = panel.querySelectorAll(".scale-btn");
+
+  buttons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      // 同パネル内のactiveを全解除
+      buttons.forEach((b) => b.classList.remove("is-active"));
+
+      // 押したボタンだけactive
+      btn.classList.add("is-active");
+    });
+  });
+}
+
+function ensureEthnicTooltip() {
+  let el = document.getElementById("ethnicTooltip");
+  if (el) return el;
+
+  el = document.createElement("div");
+  el.id = "ethnicTooltip";
+  el.className = "ethnic-tooltip";
+  document.body.appendChild(el);
+  return el;
+}
+
+function setEthnicTooltipContent(scaleId) {
+  const tt = ensureEthnicTooltip();
+  const def = ETHNIC_SCALES[scaleId];
+  if (!def) return;
+
+  const { allowedNames, removedNames } = getAllowedAndRemovedNoteNames();
+
+  tt.innerHTML = `
+    <div class="tt-title">${def.name}</div>
+    <div class="tt-row">${def.hint || ""}</div>
+    <div class="tt-row tt-muted">今のキー：${currentKeyName} / ${scaleMode}</div>
+    <div class="tt-row">使える音：${allowedNames.join(" , ")}</div>
+    <div class="tt-row">使わない音：${removedNames.join(" , ")}</div>
+  `;
+}
+
+function showEthnicTooltipAt(x, y) {
+  const tt = ensureEthnicTooltip();
+  const pad = 14;
+  tt.style.left = `${x + pad}px`;
+  tt.style.top = `${y + pad}px`;
+  tt.classList.add("is-show");
+}
+
+function hideEthnicTooltip() {
+  const tt = document.getElementById("ethnicTooltip");
+  if (!tt) return;
+  tt.classList.remove("is-show");
+}
+
+function getRestrictionPitchClasses() {
+  // 民族スケールが未選択 or none なら制限なし
+  if (!currentEthnicScaleId || currentEthnicScaleId === "none") return null;
+
+  const def = ETHNIC_SCALES[currentEthnicScaleId];
+  if (!def || !Array.isArray(def.intervals)) return null;
+
+  const rootSharp = normalizeLabelToSharp(currentKeyName);
+  const rootPc = NOTE_NAMES_SHARP.indexOf(rootSharp);
+  if (rootPc < 0) return null;
+
+  return def.intervals.map((iv) => (rootPc + iv) % 12);
+}
+
+function getAllowedAndRemovedNoteNames() {
+  const allowedPcs = getRestrictionPitchClasses();
+  const allowedSet = new Set(allowedPcs);
+
+  // ドーナツ表記は # に寄せてる前提
+  const allowedNames = allowedPcs.map((pc) => NOTE_NAMES_SHARP[pc]);
+
+  const removedNames = NOTE_NAMES_SHARP.map((name, pc) => ({ name, pc }))
+    .filter(({ pc }) => !allowedSet.has(pc))
+    .map(({ name }) => name);
+
+  return { allowedNames, removedNames };
+}
+
+function updatePianoDisabledKeys() {
+  const pcs = getRestrictionPitchClasses();
+
+  // 制限なし → すべて有効
+  if (pcs == null) {
+    document.querySelectorAll(".key").forEach((keyEl) => {
+      keyEl.classList.remove("is-disabled");
+    });
+    return;
+  }
+
+  const allowedPcs = new Set(pcs);
+
+  document.querySelectorAll(".key").forEach((keyEl) => {
+    const baseMidi = Number(keyEl.dataset.midi);
+    if (!Number.isFinite(baseMidi)) return;
+
+    const actual = toActualMidi(baseMidi);
+    let pc = actual % 12;
+    if (pc < 0) pc += 12;
+
+    keyEl.classList.toggle("is-disabled", !allowedPcs.has(pc));
+  });
+}
+
+function isAllowedActualMidi(actualMidi) {
+  const pcs = getRestrictionPitchClasses();
+  if (pcs == null) return true;
+
+  const allowedPcs = new Set(pcs);
+  let pc = actualMidi % 12;
+  if (pc < 0) pc += 12;
+  return allowedPcs.has(pc);
+}
 
 /* =========================
  * Theory wheel SVG
@@ -1262,7 +1457,7 @@ function drawTheoryWheelRootStars() {
   const minorPc = (majorPc + 9) % 12; // -3 mod12
   const minorRoot = NOTE_NAMES_SHARP[minorPc];
 
-  document.querySelectorAll("#theoryWheel .wheel-seg").forEach(seg => {
+  document.querySelectorAll("#theoryWheel .wheel-seg").forEach((seg) => {
     const note = seg.dataset.note;
 
     let color = null;
@@ -1280,10 +1475,7 @@ function drawTheoryWheelRootStars() {
 
     const p = polarToCartesian(cx, cy, rStar, angle);
 
-    const star = document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "text"
-    );
+    const star = document.createElementNS("http://www.w3.org/2000/svg", "text");
 
     star.setAttribute("x", p.x);
     star.setAttribute("y", p.y);
@@ -1376,22 +1568,89 @@ function drawTheoryWheelChordLines(noteNames) {
 
 // スケール構成音ハイライト更新
 function updateTheoryWheelScaleHighlight() {
-  const pcs = getScalePitchClasses(currentKeyName, scaleMode);
-  const allowed = new Set(pcs.map((pc) => NOTE_NAMES_SHARP[pc]));
+  // 表示の白鍵/黒鍵（今のメジャー/マイナー）は従来通り
+  const basePcs = getScalePitchClasses(currentKeyName, scaleMode);
+  const baseAllowed = new Set(basePcs.map((pc) => NOTE_NAMES_SHARP[pc]));
+
+  // “薄くする”制限は民族スケール選択時だけ
+  const restrictPcs = getRestrictionPitchClasses();
+  const restrictAllowed =
+    restrictPcs == null
+      ? null
+      : new Set(restrictPcs.map((pc) => NOTE_NAMES_SHARP[pc]));
 
   document.querySelectorAll("#theoryWheel .wheel-seg").forEach((seg) => {
     const note = seg.dataset.note;
-    const isScale = allowed.has(note);
 
-    // 部屋の色切り替え
+    // 白鍵/黒鍵の見た目（メジャー/マイナー基準）
+    const isScale = baseAllowed.has(note);
     seg.classList.toggle("is-scale", isScale);
 
-    // 対応する文字も一緒に切り替え
-    const text = seg.nextSibling; // すぐ後にtext置いてる構造ならこれでOK
+    // 薄くする（民族スケールがある時だけ）
+    const isDisabled = restrictAllowed ? !restrictAllowed.has(note) : false;
+    seg.classList.toggle("is-disabled", isDisabled);
+
+    const text = seg.nextSibling;
     if (text && text.classList) {
       text.classList.toggle("is-scale", isScale);
+      text.classList.toggle("is-disabled", isDisabled);
     }
   });
+}
+
+function setupEthnicScaleControls() {
+  const panel = document.querySelector(".ethnic-panel");
+  if (!panel) return;
+
+  const buttons = panel.querySelectorAll(".scale-btn");
+  if (!buttons.length) return;
+
+  function setActiveUI(targetBtn) {
+    buttons.forEach((b) => b.classList.remove("is-active"));
+    targetBtn.classList.add("is-active");
+  }
+
+  function applyAllScaleUIUpdates() {
+    // ピアノ + ドーナツ + 既存のルート星なども必要なら
+    updatePianoDisabledKeys();
+    updateTheoryWheelScaleHighlight();
+
+    // コード線/多角形は「最後に鳴らしたコード」があるなら引き直してもOK（任意）
+    // ここは好み：今は触らなくてもOK
+  }
+
+  buttons.forEach((btn) => {
+    const scaleId = btn.dataset.scale;
+    if (!scaleId) return;
+
+    // hover tooltip
+    btn.addEventListener("mouseenter", (e) => {
+      setEthnicTooltipContent(scaleId);
+      showEthnicTooltipAt(e.clientX, e.clientY);
+    });
+
+    btn.addEventListener("mousemove", (e) => {
+      showEthnicTooltipAt(e.clientX, e.clientY);
+    });
+
+    btn.addEventListener("mouseleave", () => {
+      hideEthnicTooltip();
+    });
+
+    // click apply
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      currentEthnicScaleId = scaleId;
+      setActiveUI(btn);
+
+      // ★ここで反映
+      applyAllScaleUIUpdates();
+    });
+  });
+
+  // 初期反映（noneなら通常スケール）
+  applyAllScaleUIUpdates();
 }
 
 // DOM読み込み後に描画（Start前でもOKな「ただの図」なのでここで）
